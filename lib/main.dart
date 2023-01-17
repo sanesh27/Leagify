@@ -6,6 +6,7 @@ import 'package:leagify/pages/login_page.dart';
 import 'package:leagify/services/shared_services.dart';
 import 'package:leagify/widget_tree.dart';
 import 'package:dio/dio.dart';
+import 'mobile/game_details_post.dart';
 
 Widget _defaultHome =  LoginPage();
 
@@ -35,6 +36,7 @@ class MyApp extends StatelessWidget {
       routes: {
     '/' : (context) => _defaultHome,
     '/home' : (context) => HomeScreen(),
+
       },
     );
   }

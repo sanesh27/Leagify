@@ -15,6 +15,8 @@ import 'package:leagify/models/users.dart';
 import 'dart:core';
 import 'package:leagify/models/result_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:leagify/mobile/game_details_post.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({Key? key}) : super(key: key);
@@ -32,12 +34,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String _logo(key) {
     String jsonString =
-        '{"The Dudes": "https://api.nepalipatro.com.np/storage/banners/VxWkNmZUX4J8cWF7.png", "The Bokas": "https://api.nepalipatro.com.np/storage/banners/XUXgyIy36XkYJpZg.png", "The Boros": "https://api.nepalipatro.com.np/storage/banners/mOGBljlvKmlz1mf0.png", "The Goats": "https://api.nepalipatro.com.np/storage/banners/l3SvljMmHBYIJykI.png"}';
+        '{"The Dudes": "assets/dudes.svg", "The Bokas": "assets/bokas.svg", "The Boros": "assets/theboros.svg", "The Goats": "assets/goats.svg"}';
 
     Map<String, dynamic> jsonData = jsonDecode(jsonString);
-    String value = jsonData[key];
+    String value = jsonData.containsKey(key) ? jsonData[key] : "No Key";
     return value; // Output: "value2"
   }
+  bool _isAdmin = false;
 
   @override
   Widget build(BuildContext buildContext) {
@@ -46,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return Scaffold(
         backgroundColor: kCanvasColor,
         body: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Column(
+                    Padding(child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -68,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         _userProfile(),
                       ],
-                    ),
+                    ),padding: EdgeInsets.all(8),),
                     IconButton(
                         onPressed: () {
                           setState(() {
@@ -86,12 +89,13 @@ class _HomeScreenState extends State<HomeScreen> {
               SizedBox(
                 height: 24,
               ),
-              Text(
+              Padding(padding: EdgeInsets.all(8),child: Text(
                 "Standings",
                 style: kLargeSubtitle.copyWith(color: kBrandColor),
                 textAlign: TextAlign.start,
-              ),
-              _standingTable(constraints.maxWidth, constraints.maxHeight),
+              ),),
+              Padding(padding: EdgeInsets.all(8),child: _standingTable(constraints.maxWidth, constraints.maxHeight),),
+
             ],
           ),
         ),
@@ -105,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
         builder:
             (BuildContext context, AsyncSnapshot<LoginResponseModel?> model) {
           if (model.hasData) {
-            print(model.data!.email);
+            _isAdmin = model.data!.email == "kiran.silwal" ? true : false;
             return Text(
               model.data!.name + '!',
               style: kHeading(Color(0xFF3AA365)),
@@ -177,16 +181,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-                Slider(
-                  value: status.toDouble(),
-                  max: 1,
-                  divisions: 1,
-                  activeColor: kBrandColor,
-                  inactiveColor: kScoreFutureMatch,
-                  onChanged: (double value) {
-                    setState(() {});
-                  },
-                ),
+                // Slider(
+                //   value: status.toDouble(),
+                //   max: 1,
+                //   divisions: 1,
+                //   activeColor: kBrandColor,
+                //   inactiveColor: kScoreFutureMatch,
+                //   onChanged: (double value) {
+                //     setState(() {});
+                //   },
+                // ),
+                Divider(),
                 Container(
                   height: height * 0.1,
                   child: Row(
@@ -202,6 +207,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: _playerScores(
                             score, hasScore, team2, TextAlign.end),
                       ),
+
+                      _isAdmin ? IconButton(onPressed: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) =>  UpdateMatch()));
+                      }, icon: Icon(Icons.edit)) : Container(),
                     ],
                   ),
                 ),
@@ -220,10 +229,10 @@ class _HomeScreenState extends State<HomeScreen> {
         //   height: height * 0.1,
         //   // width: width * 0.08,
         // ),
-        CachedNetworkImage(
-          imageUrl: _logo(team),
-          width: width * 0.15,
-        ),
+        SvgPicture.asset(
+        _logo(team),
+        width: width * 0.15,
+    ),
         SizedBox(
           height: 20,
         ),
@@ -238,15 +247,15 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _score(DateTime scheduledTime, String gameweek, String team1Score,
       String team2Score, int status, height) {
     DateTime now = DateTime.now();
-    Duration difference = scheduledTime.difference(now);
+    Duration difference = scheduledTime.toLocal().difference(now);
     String dateString =
         DateFormat("EEE, MMM d").format(scheduledTime).toString();
 
-    if (difference.inDays == 0) {
+    if (now.year == scheduledTime.year && now.month == scheduledTime.month && now.day == scheduledTime.day) {
       dateString = "Today";
-    } else if (difference.inDays == -1) {
+    } else if (now.year == scheduledTime.year && now.month == scheduledTime.month && (now.day - scheduledTime.day) == 1) {
       dateString = "Yesterday";
-    } else if (difference.inDays == 1) {
+    } else if (now.year == scheduledTime.year && now.month == scheduledTime.month && (now.day + scheduledTime.day) == 1) {
       dateString = "Tomorrow";
     }
 
@@ -325,70 +334,105 @@ class _HomeScreenState extends State<HomeScreen> {
           if (model.hasData) {
             model.data!.sort((a, b) => b.points.compareTo(a.points));
             return Card(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
-              elevation: 1,
-              child: Container(
-                  height: height * 0.2,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Table(
-                      children: [
-                        TableRow(
-                          children: [
-                            Text(
-                              'Team',
-                              style: kNormalSize.copyWith(
-                                  color: kScoreFutureMatch),
-                            ),
-                            Text('MP',
-                                style: kNormalSize.copyWith(
-                                    color: kScoreFutureMatch)),
-                            Text('Win',
-                                style: kNormalSize.copyWith(
-                                    color: kScoreFutureMatch)),
-                            Text('Draw',
-                                style: kNormalSize.copyWith(
-                                    color: kScoreFutureMatch)),
-                            Text('Points',
-                                style: kNormalSize.copyWith(
-                                    color: kScoreFutureMatch)),
-                          ],
-                        ),
-                        for (var i = 0; i < model.data!.length; i++)
-                          TableRow(
-                            decoration: BoxDecoration(
-                                color:
-                                    i.isEven ? kScoreFutureMatch : Colors.white,
-                                shape: BoxShape.rectangle),
-                            children: [
-                              Text(
-                                model.data![i].teamName,
-                                style: kNormalSize,
-                              ),
-                              Text(
-                                (model.data![i].played )
-                                    .toString(),
-                                style: kNormalSize,
-                              ),
-                              Text(model.data![i].win.toString(),
-                                  style: kNormalSize),
-                              Text(model.data![i].draw.toString(),
-                                  style: kNormalSize),
-                              Text(model.data![i].points.toString(),
-                                  style: kNormalSize),
-                            ],
-                          ),
-                      ],
-                    ),
-                  )),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              child: Padding(padding: EdgeInsets.all(8.0),child: Column(
+                children: [
+                  _tableRow("Team","GP","W","D","L","Pts",width),
+                  for (var items in model.data!) _tableRow(items.teamName.toString(),items.played.toString(),items.win.toString(),items.draw.toString(),items.loss.toString(),items.points.toString(),width),
+                ],
+              ),)
             );
+            // return Card(
+            //   shape: RoundedRectangleBorder(
+            //       borderRadius: BorderRadius.circular(16)),
+            //   elevation: 1,
+            //   child: Container(
+            //       height: height * 0.2,
+            //       child: Padding(
+            //         padding: const EdgeInsets.all(16.0),
+            //         child: Table(
+            //           children: [
+            //             TableRow(
+            //               children: [
+            //                 Text(
+            //                   'Team',
+            //                   style: kNormalSize.copyWith(
+            //                       color: kScoreFutureMatch),
+            //                 ),
+            //                 Text('MP',
+            //                     style: kNormalSize.copyWith(
+            //                         color: kScoreFutureMatch)),
+            //                 Text('Win',
+            //                     style: kNormalSize.copyWith(
+            //                         color: kScoreFutureMatch)),
+            //                 Text('Draw',
+            //                     style: kNormalSize.copyWith(
+            //                         color: kScoreFutureMatch)),
+            //                 Text('Points',
+            //                     style: kNormalSize.copyWith(
+            //                         color: kScoreFutureMatch)),
+            //               ],
+            //             ),
+            //             for (var i = 0; i < model.data!.length; i++)
+            //               TableRow(
+            //                 decoration: BoxDecoration(
+            //                     color:
+            //                         i.isEven ? kScoreFutureMatch : Colors.white,
+            //                     shape: BoxShape.rectangle),
+            //                 children: [
+            //                   Text(
+            //                     model.data![i].teamName,
+            //                     style: kNormalSize,
+            //                   ),
+            //                   Text(
+            //                     (model.data![i].played )
+            //                         .toString(),
+            //                     style: kNormalSize,
+            //                   ),
+            //                   Text(model.data![i].win.toString(),
+            //                       style: kNormalSize),
+            //                   Text(model.data![i].draw.toString(),
+            //                       style: kNormalSize),
+            //                   Text(model.data![i].points.toString(),
+            //                       style: kNormalSize),
+            //                 ],
+            //               ),
+            //           ],
+            //         ),
+            //       )),
+            // );
           } else {
             return Center(child: CircularProgressIndicator());
           }
         });
   }
 
+
+  Widget _tableRow(String teamName,String played, String win, String draw, String loss, String points,double width){
+
+   _getLogo(String teamName){
+    return SvgPicture.asset(
+      _logo(teamName),
+      width: 40,
+    );}
+    return Column(
+      children: [
+        Padding(padding: EdgeInsets.all(4),child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(child: _logo(teamName) == "No Key" ? Container(width: 40,) : _getLogo(teamName),flex:1),
+            Expanded(child: Text(teamName,style: kNormalSize,),flex:2),
+            Expanded(child: Text(played.toString(),style: kNormalSize,),flex:1),
+            Expanded(child:  Text(win.toString(),style: kNormalSize,),flex:1),
+            Expanded(child: Text(draw.toString(),style: kNormalSize,),flex:1),
+            Expanded(child: Text(loss.toString(),style: kNormalSize,),flex:1),
+            Expanded(child: Text(points.toString(),style: kNormalSize,),flex:1)
+          ],
+        ),),
+        Divider()
+      ],
+    );
+  }
   // }
 }
 
