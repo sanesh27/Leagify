@@ -2,12 +2,11 @@ import 'dart:convert';
 
 import 'package:api_cache_manager/api_cache_manager.dart';
 import 'package:api_cache_manager/models/cache_db_model.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:leagify/pages/login_page.dart';
+import 'package:leagify/services/api_service.dart';
 
 import '../models/login_response_model.dart';
-import '../models/player_image.dart';
 
 class SharedService {
   static Future<bool> isLoogedIn() async {
@@ -28,13 +27,14 @@ class SharedService {
     }
   }
 
-  static Future<Map> cachedPlayerImages()  async {
+  static Future<Map<String, dynamic>> cachedPlayerImages()  async {
     var isKeyExist = await APICacheManager().isAPICacheKeyExist(
         "player_images");
     if (isKeyExist) {
       var cacheData = await APICacheManager().getCacheData("player_images");
       return jsonDecode(cacheData.syncData);
     } else {
+      APIService.players();
       return {};
     }
   }
@@ -53,7 +53,6 @@ class SharedService {
 
     static Future<void> logout(BuildContext context) async {
     await APICacheManager().deleteCache("login_details");
-    print("Logged out, Navigating to root directory");
     Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
     }
   }

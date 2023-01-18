@@ -34,7 +34,6 @@ class MatchList {
   List<Score?>? scores;
 
   factory MatchList.fromJson(Map<String, dynamic> json) {
-    print(json["scores"]);
     return MatchList(
       gameId: json["game_id"],
       gameweek: json["gameweek"],
@@ -79,7 +78,6 @@ class Score {
   int? statsTime;
 
   factory Score.fromJson(Map<String, dynamic> json) {
-    print (json["player_name"] + ' : '+ json["stats_type"]);
 
 
     return Score(

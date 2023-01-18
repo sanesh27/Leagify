@@ -1,14 +1,9 @@
-import 'package:api_cache_manager/api_cache_manager.dart';
+
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:leagify/mobile/home_screen.dart';
-import 'package:leagify/mobile/sign_in_page.dart';
 import 'package:leagify/pages/login_page.dart';
-import 'package:leagify/services/api_service.dart';
 import 'package:leagify/services/shared_services.dart';
-import 'package:leagify/widget_tree.dart';
-import 'package:dio/dio.dart';
-import 'mobile/game_details_post.dart';
+
 
 Widget _defaultHome =  LoginPage();
 
@@ -16,16 +11,13 @@ Widget _defaultHome =  LoginPage();
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   bool _result = await SharedService.isLoogedIn();
-  var data = await APIService.players();
-  print(data);
-  // var data = await APICacheManager().getCacheData('player_images');
   if(_result){
-    _defaultHome =  HomeScreen();
+    _defaultHome =  const HomeScreen();
   }
 
 
 
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -43,44 +35,9 @@ class MyApp extends StatelessWidget {
       // home: const MyHomePage(),
       routes: {
     '/' : (context) => _defaultHome,
-    '/home' : (context) => HomeScreen(),
+    '/home' : (context) => const HomeScreen(),
 
       },
     );
   }
 }
-
-
-
-// class MyHomePage extends StatefulWidget {
-//   const MyHomePage({super.key});
-//
-//
-//
-//   @override
-//   State<MyHomePage> createState() => _MyHomePageState();
-// }
-//
-// class _MyHomePageState extends State<MyHomePage> {
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       // appBar: AppBar(
-//       //   title: Text("Leagify"),
-//       // ),
-//       body: WidgetTree(),
-//       // body: LayoutBuilder(
-//       //   builder: (context,constraints) {
-//       //     if(constraints.maxWidth < 600){
-//       //       return MobileHomeScreen();
-//       //     }else{
-//       //
-//       //       return const Center(child: Text("None!"),);
-//       //     }
-//       //
-//       //   }
-//       );
-//
-//   }
-// }

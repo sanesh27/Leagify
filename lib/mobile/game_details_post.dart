@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
 class UpdateMatch extends StatefulWidget {
+  const UpdateMatch({super.key});
+
   @override
   _UpdateMatchState createState() => _UpdateMatchState();
 }
 
 class _UpdateMatchState extends State<UpdateMatch> {
-  int _currentStep = 0;
+  final int _currentStep = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -15,24 +17,23 @@ class _UpdateMatchState extends State<UpdateMatch> {
         currentStep: _currentStep,
         steps: [
           Step(
-            title: Text("Step 1"),
-            content: Text("This is the first step"),
+            title: const Text("Step 1"),
+            content: const Text("This is the first step"),
             isActive: _currentStep >= 0,
           ),
           Step(
-            title: Text("Step 2"),
-            content: Text("This is the second step"),
+            title: const Text("Step 2"),
+            content: const Text("This is the second step"),
             isActive: _currentStep >= 1,
           ),
           Step(
-            title: Text("Step 3"),
-            content: Text("This is the third step"),
+            title: const Text("Step 3"),
+            content: const Text("This is the third step"),
             isActive: _currentStep >= 2,
           ),
         ],
         type: StepperType.vertical,
         controlsBuilder: (BuildContext context, ControlsDetails controlsDetails) {
-          print(controlsDetails.currentStep);
           return Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
@@ -41,19 +42,19 @@ class _UpdateMatchState extends State<UpdateMatch> {
             child: Column(
               children: <Widget>[
                 ElevatedButton(
-                  child: Text(
+                  onPressed: controlsDetails.onStepContinue,
+                  child: const Text(
                     "Continue",
                     style: TextStyle(color: Colors.white),
                   ),
-                  onPressed: controlsDetails.onStepContinue,
                 ),
-                SizedBox(height: 16,),
+                const SizedBox(height: 16,),
                 ElevatedButton(
-                  child: Text(
+                  onPressed: controlsDetails.onStepCancel,
+                  child: const Text(
                     "Cancel",
                     style: TextStyle(color: Colors.white),
                   ),
-                  onPressed: controlsDetails.onStepCancel,
                 ),
               ],
             ),

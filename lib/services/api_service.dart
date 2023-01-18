@@ -1,12 +1,10 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:leagify/main.dart';
 import 'package:leagify/models/login_request.dart';
 import 'package:leagify/config.dart';
 import 'package:leagify/models/login_response_model.dart';
 import 'package:leagify/models/match_list.dart';
-import 'package:leagify/models/player_image.dart';
 import 'package:leagify/models/player_stats.model.dart';
 import 'package:leagify/services/shared_services.dart';
 
@@ -20,7 +18,6 @@ class APIService {
     Map<String, String> requestHeaders = {'Content-Type': 'application/json'};
 
     var url = Uri.http(Config.apiURL, Config.loginAPI);
-    print("posting to $url");
     var response = await client.post(url,
         headers: requestHeaders, body: jsonEncode(model.toJson()));
 
@@ -28,7 +25,6 @@ class APIService {
       await SharedService.setLoginDetails(loginResponsejson(response.body));
       return true;
     } else {
-      print(requestHeaders);
       return false;
     }
   }
@@ -37,7 +33,6 @@ class APIService {
     Map<String, String> requestHeaders = {'Content-Type': 'application/json'};
 
     var url = Uri.http(Config.apiURL, Config.profile);
-    print("posting to $url");
     var response = await client.get(url,
         headers: requestHeaders,);
     Map<String, dynamic> mapData = jsonDecode(response.body);
@@ -46,7 +41,6 @@ class APIService {
       // await SharedService.setPlayerImages(PlayerImage(data: mapData));
       return true;
     } else {
-      print(requestHeaders);
       return false;
     }
   }
@@ -61,7 +55,6 @@ class APIService {
       // 'authorization' : '${loginDetails!.jwt}'
     };
     var url = Uri.http(Config.apiURL, Config.matches);
-    print('calling matches');
     var response = await client.get(url, headers: requestHeaders);
 
     if (response.statusCode == 200) {
@@ -82,7 +75,6 @@ class APIService {
       // 'authorization' : '${loginDetails!.jwt}'
     };
     var url = Uri.http(Config.apiURL, Config.standings);
-    print('calling $url');
     var apiResponse = await client.get(url, headers: requestHeaders);
 
     if (apiResponse.statusCode == 200) {
@@ -121,7 +113,6 @@ class APIService {
       // List<TeamStanding> teamStandings = jsonDecode(apiResponse.body).map((team) => TeamStanding.fromJson(team)).toList();
       return teamStanding;
     } else {
-      print("no 200");
       return [];
     }
   }
@@ -133,7 +124,6 @@ class APIService {
       // 'authorization' : '${loginDetails!.jwt}'
     };
     var url = Uri.http(Config.apiURL, Config.goals);
-    print('calling $url');
     var apiResponse = await client.get(url, headers: requestHeaders);
 
     if (apiResponse.statusCode == 200) {
@@ -151,7 +141,6 @@ class APIService {
       // List<TeamStanding> teamStandings = jsonDecode(apiResponse.body).map((team) => TeamStanding.fromJson(team)).toList();
       return playerStats;
     } else {
-      print("no 200");
       return [];
     }
   }

@@ -1,5 +1,7 @@
 
 
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 
 Color kBrandColor = const Color(0xFF3AA365);
@@ -52,3 +54,5 @@ TextField kField(String hint,bool obscure) {
     obscureText: obscure,
   );
 }
+
+// Unit8List kTransparentImage = Image.memory(Uint8List.fromList([0]), width: 1.0, height: 1.0, fit: BoxFit.cover);

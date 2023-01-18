@@ -5,9 +5,10 @@ import 'package:leagify/services/api_service.dart';
 import 'package:snippet_coder_utils/FormHelper.dart';
 import 'package:snippet_coder_utils/ProgressHUD.dart';
 
-import '../config.dart';
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
@@ -24,12 +25,12 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       backgroundColor: kCanvasColor,
       body: ProgressHUD(
-        child: Form(
-          child: _loginUI(context),
-          key: globalFormKey,
-        ),
         key: UniqueKey(),
         inAsyncCall: isAPIcallProgress,
+        child: Form(
+          key: globalFormKey,
+          child: _loginUI(context),
+        ),
       ),
     );
   }
@@ -40,7 +41,7 @@ class _LoginPageState extends State<LoginPage> {
         double height = constraints.maxHeight;
         return Column(
           children: [
-            Container(
+            SizedBox(
               height: height * 0.25,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -52,18 +53,18 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   Text(
                     "Leagify!",
-                    style: kHeading(Color(0xFF3AA365)),
+                    style: kHeading(const Color(0xFF3AA365)),
                   ),
                 ],
               ),
             ),
-            Container(
+            SizedBox(
               height: height * 0.35,
               child: const Image(
                 image: AssetImage("assets/champions.png"),
               ),
             ),
-            Container(
+            SizedBox(
               height: height * 0.4,
               child: Column(
 
