@@ -29,6 +29,49 @@
             {
               "client_id": "32897545778-of55a0c3r7qisqgucuaacfakt4ipeahu.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "32897545778-estr1cgh0la0nkqb4fdqellhcam87jdi.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.leagify"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:32897545778:android:7d324d66d81db375d12e2b",
+        "android_client_info": {
+          "package_name": "com.leagify"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "32897545778-of55a0c3r7qisqgucuaacfakt4ipeahu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDd2ZQrd6JfJe3qU9IIj_KiWDpnZZkFSX4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "32897545778-of55a0c3r7qisqgucuaacfakt4ipeahu.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "32897545778-estr1cgh0la0nkqb4fdqellhcam87jdi.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.leagify"
+              }
             }
           ]
         }
