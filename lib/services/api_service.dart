@@ -6,6 +6,8 @@ import 'package:leagify/models/login_request.dart';
 import 'package:leagify/config.dart';
 import 'package:leagify/models/login_response_model.dart';
 import 'package:leagify/models/match_list.dart';
+import 'package:leagify/models/player_image.dart';
+import 'package:leagify/models/player_stats.model.dart';
 import 'package:leagify/services/shared_services.dart';
 
 import '../models/result_model.dart';
@@ -31,23 +33,25 @@ class APIService {
     }
   }
 
-  static Future<String> getUserProfile() async {
-    var loginDetails = await SharedService.loginDetails();
-    print(loginDetails!.jwt);
-    Map<String, String> requestHeaders = {
-      'content-Type': 'application/json',
-      // 'authorization' : '${loginDetails!.jwt}'
-    };
+  static Future<bool> players() async {
+    Map<String, String> requestHeaders = {'Content-Type': 'application/json'};
+
     var url = Uri.http(Config.apiURL, Config.profile);
-
-    var response = await client.get(url, headers: requestHeaders);
-
+    print("posting to $url");
+    var response = await client.get(url,
+        headers: requestHeaders,);
+    Map<String, dynamic> mapData = jsonDecode(response.body);
+    SharedService.setPlayerImages(mapData);
     if (response.statusCode == 200) {
-      return response.body;
+      // await SharedService.setPlayerImages(PlayerImage(data: mapData));
+      return true;
     } else {
-      return "";
+      print(requestHeaders);
+      return false;
     }
   }
+
+
 
   static Future<List<MatchList>> getMatchCards() async {
     // var loginDetails = await SharedService.loginDetails();
@@ -116,6 +120,36 @@ class APIService {
       // print(teamStanding);
       // List<TeamStanding> teamStandings = jsonDecode(apiResponse.body).map((team) => TeamStanding.fromJson(team)).toList();
       return teamStanding;
+    } else {
+      print("no 200");
+      return [];
+    }
+  }
+  static Future<List<PlayerStats>> getGoals() async {
+    // var loginDetails = await SharedService.loginDetails();
+    // print(loginDetails!.jwt);
+    Map<String, String> requestHeaders = {
+      'content-Type': 'application/json',
+      // 'authorization' : '${loginDetails!.jwt}'
+    };
+    var url = Uri.http(Config.apiURL, Config.goals);
+    print('calling $url');
+    var apiResponse = await client.get(url, headers: requestHeaders);
+
+    if (apiResponse.statusCode == 200) {
+      Map newResponse = jsonDecode(apiResponse.body);
+      //{"Saurav":{"Goal":1},"Bikram":{"Goal":2,"Assists":1},"Samin":{"Goal":1,"Assists":2},"Niraj":{"Goal":1},"Shivlal":{"Goal":1},"Shiv":{"Yellow":1},"Dilli":{"Assists":1}}
+
+      List<PlayerStats> playerStats = [];
+      newResponse.forEach((key, value) {
+
+      playerStats.add(PlayerStats(name: key, goal: newResponse[key]["Goal"] ?? 0, assists: newResponse[key]["Assists"] ?? 0, yellow: newResponse[key]["Yellow"] ?? 0, red: newResponse[key]["Red"] ?? 0 ));
+
+      });
+
+      // print(teamStanding);
+      // List<TeamStanding> teamStandings = jsonDecode(apiResponse.body).map((team) => TeamStanding.fromJson(team)).toList();
+      return playerStats;
     } else {
       print("no 200");
       return [];

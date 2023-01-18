@@ -23,7 +23,7 @@ TextStyle kHeading(Color color) {
 
 
 TextStyle kLargeSubtitle =  TextStyle(
-    fontFamily: "Helvetica Neue", fontSize: 24.0, fontWeight: FontWeight.bold,color: kScoreStyle);
+    fontFamily: "Helvetica Neue", fontSize: 16.0, fontWeight: FontWeight.bold,color: kScoreStyle);
 TextStyle kNormalSize =  TextStyle(
     fontFamily: "Helvetica Neue", fontSize: 12.0, fontWeight: FontWeight.bold,color: kScoreStyle);
 TextStyle kSmallSubtitle =  TextStyle(

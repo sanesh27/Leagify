@@ -6,6 +6,7 @@ class Config {
   static const String profile = "/api/userprofile";
   static const String matches = "/api/matches";
   static const String standings = "/api/standings";
-  static const String updateMatch = "/api/game/";
+  static const String updateMatch = "/api/game";
+  static const String goals = "/api/goals";
 
 }

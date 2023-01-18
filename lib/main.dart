@@ -1,8 +1,10 @@
+import 'package:api_cache_manager/api_cache_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:leagify/mobile/home_screen.dart';
 import 'package:leagify/mobile/sign_in_page.dart';
 import 'package:leagify/pages/login_page.dart';
+import 'package:leagify/services/api_service.dart';
 import 'package:leagify/services/shared_services.dart';
 import 'package:leagify/widget_tree.dart';
 import 'package:dio/dio.dart';
@@ -14,9 +16,15 @@ Widget _defaultHome =  LoginPage();
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   bool _result = await SharedService.isLoogedIn();
+  var data = await APIService.players();
+  print(data);
+  // var data = await APICacheManager().getCacheData('player_images');
   if(_result){
     _defaultHome =  HomeScreen();
   }
+
+
+
   runApp(MyApp());
 }
 
