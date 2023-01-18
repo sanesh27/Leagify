@@ -67,6 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext buildContext) {
     return LayoutBuilder(builder: (context, constraints) {
       double height = constraints.maxHeight;
+      print('width: ' + constraints.maxWidth.toString());
       return Scaffold(
         backgroundColor: kCanvasColor,
         body: Padding(
@@ -187,6 +188,8 @@ class _HomeScreenState extends State<HomeScreen> {
     int status = model.data![index].status!;
     bool hasScore = status == 1 ? true : false;
     List<Score?> score = model.data![index].scores!;
+    Map<String, int> goalSum = {};
+
 
     return Container(
       width: width * 0.8,
@@ -232,12 +235,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
-                          flex: 1,
+                          flex: 2,
                           child: _playerScores(
                               score, hasScore, team1, TextAlign.start),
                         ),
+                        status == 1 ? Icon(Icons.sports_soccer,color: kScoreFutureMatch,) : Container(height: 0,width: 0,),
                         Expanded(
-                          flex: 1,
+                          flex: 2,
                           child: _playerScores(
                               score, hasScore, team2, TextAlign.end),
                         ),
@@ -247,7 +251,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 Expanded(child: _isAdmin ? IconButton(onPressed: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) =>  UpdateMatch()));
-                }, icon: Icon(Icons.edit)) : Container(),flex: 1,)
+                }, icon: Icon(Icons.edit,size: 15,)) : Container(),flex: 1,)
               ],
             ),
         ),
@@ -267,8 +271,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Expanded(
           child: SvgPicture.asset(
           _logo(team),
-          width: width * 0.15,
-            fit: BoxFit.fitWidth,
+          width: width * 0.15, fit: BoxFit.contain,
     ),flex: 2,
         ),
         // SizedBox(
@@ -346,13 +349,14 @@ class _HomeScreenState extends State<HomeScreen> {
       List<Score?> newScore = matchPlayerScores
           .where((e) => e!.team.toString() == team && e.statsType == "Goal")
           .toList();
+      newScore.sort((a,b) => a!.statsTime!.compareTo(b!.statsTime!));
       print(newScore);
       return ListView.builder(
         itemCount: newScore.length,
         scrollDirection: Axis.vertical,
         itemBuilder: (context, index) {
           return Text(
-            newScore[index]!.playerName!,
+            newScore[index]!.playerName! + " " + newScore[index]!.statsTime.toString()+ "'" ,
             textAlign: align,
             style: kSmallSubtitle.copyWith(fontSize: 12),
           );

@@ -1,80 +1,65 @@
 import 'package:flutter/material.dart';
-import 'package:leagify/constants.dart';
-import 'package:snippet_coder_utils/FormHelper.dart';
-import 'package:leagify/models/match_list.dart';
 
 class UpdateMatch extends StatefulWidget {
-   UpdateMatch({Key? key}) : super(key: key);
-
-
   @override
-  State<UpdateMatch> createState() => _UpdateMatchState();
+  _UpdateMatchState createState() => _UpdateMatchState();
 }
 
 class _UpdateMatchState extends State<UpdateMatch> {
-  int status = 0;
-  int winner = 0;
-
+  int _currentStep = 0;
 
   @override
   Widget build(BuildContext context) {
-    List<dynamic> productTypesList = [];
-    productTypesList.add({"id": "simple", "name": "Simple"});
-    productTypesList.add({"id": "variable", "name": "Variable"});
-    return Scaffold(
-      backgroundColor: kCanvasColor,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          FormHelper.inputFieldWidget(
-            context,
-            "Status",
-            "Status",
-                (onValidateVal) {
-              if (onValidateVal.isEmpty) {
-                return "username cant be empty";
-              }
-              return null;
-            },
-                (onSavedVal) {
-              status = onSavedVal;
-            },
-            borderColor: kCanvasColor,
-            suffixIcon: const Icon(
-              Icons.person,
-            ),
-            borderFocusColor: kBrandColor,
-            textColor: Colors.black54,
-            hintColor: Colors.black12,
-            borderRadius: 16,
-
-            backgroundColor: kScoreFutureMatch,
-            prefixIconColor: Colors.black12,
+    return Material(
+      child: Stepper(
+        currentStep: _currentStep,
+        steps: [
+          Step(
+            title: Text("Step 1"),
+            content: Text("This is the first step"),
+            isActive: _currentStep >= 0,
           ),
-          FormHelper.dropDownWidget(
-            context,
-            "Select Product Type",
-            "",
-            productTypesList,
-                (onChangedVal) {
-
-            },
-                (onValidateVal) {
-              if (onValidateVal == null) {
-                return 'Please Select Product Type';
-              }
-
-              return null;
-            },
-            borderFocusColor: Theme.of(context).primaryColor,
-            borderColor: Theme.of(context).primaryColor,
-            borderRadius: 10,
+          Step(
+            title: Text("Step 2"),
+            content: Text("This is the second step"),
+            isActive: _currentStep >= 1,
           ),
-
-
+          Step(
+            title: Text("Step 3"),
+            content: Text("This is the third step"),
+            isActive: _currentStep >= 2,
+          ),
         ],
+        type: StepperType.vertical,
+        controlsBuilder: (BuildContext context, ControlsDetails controlsDetails) {
+          print(controlsDetails.currentStep);
+          return Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: Colors.green[300],
+            ),
+            child: Column(
+              children: <Widget>[
+                ElevatedButton(
+                  child: Text(
+                    "Continue",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onPressed: controlsDetails.onStepContinue,
+                ),
+                SizedBox(height: 16,),
+                ElevatedButton(
+                  child: Text(
+                    "Cancel",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onPressed: controlsDetails.onStepCancel,
+                ),
+              ],
+            ),
+          );
+        },
       ),
-
     );
   }
 }

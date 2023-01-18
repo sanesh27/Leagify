@@ -70,11 +70,13 @@ class Score {
     this.playerName,
     this.team,
     this.statsType,
+    this.statsTime,
   });
 
   String? playerName;
   String? team;
   String? statsType;
+  int? statsTime;
 
   factory Score.fromJson(Map<String, dynamic> json) {
     print (json["player_name"] + ' : '+ json["stats_type"]);
@@ -84,6 +86,7 @@ class Score {
       playerName: json["player_name"],
       team: json["team"],
       statsType: json["stats_type"],
+      statsTime : json["stats_time"]
     );
   }
 
@@ -91,5 +94,7 @@ class Score {
     "player_name": playerName ?? "Not updated",
     "team": team ?? "Not updated",
     "stats_type": statsType ?? "Not updated",
+    "stats_time": statsType ?? "Not updated",
+
   };
 }
