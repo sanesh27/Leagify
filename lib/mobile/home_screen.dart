@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:api_cache_manager/api_cache_manager.dart';
+import 'package:api_cache_manager/models/cache_db_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:leagify/models/login_response_model.dart';
@@ -52,9 +53,11 @@ class _HomeScreenState extends State<HomeScreen> {
 @override
   void initState() {
     // TODO: implement initState
+
   _loadData();
 
     super.initState();
+    APICacheDBModel(key: 'player_images', syncData: 'player_images');
   }
 
   _loadData() async {
@@ -291,7 +294,7 @@ class _HomeScreenState extends State<HomeScreen> {
       dateString = "Today";
     } else if (now.year == scheduledTime.year && now.month == scheduledTime.month && (now.day - scheduledTime.day) == 1) {
       dateString = "Yesterday";
-    } else if (now.year == scheduledTime.year && now.month == scheduledTime.month && (now.day + scheduledTime.day) == 1) {
+    } else if (now.year == scheduledTime.year && now.month == scheduledTime.month && (scheduledTime.day - now.day) == 1) {
       dateString = "Tomorrow";
     }
 
