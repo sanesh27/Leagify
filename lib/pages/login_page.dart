@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:leagify/constants.dart';
 import 'package:leagify/models/login_request.dart';
@@ -148,7 +150,7 @@ class _LoginPageState extends State<LoginPage> {
                                 Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false)
                               }
                               else {
-                                FormHelper.showSimpleAlertDialog(context, "Leagify App", "Wrong User/Pass", "Ok", (){
+                                FormHelper.showSimpleAlertDialog(context, "Leagify App", "Please check your connectivity and User/Pass", "Ok", (){
                                   Navigator.pop(context);
                                   setState(() {
                                     isAPIcallProgress = false;

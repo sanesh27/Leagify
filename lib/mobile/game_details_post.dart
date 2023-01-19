@@ -8,7 +8,7 @@ class UpdateMatch extends StatefulWidget {
 }
 
 class _UpdateMatchState extends State<UpdateMatch> {
-  final int _currentStep = 0;
+   int _currentStep = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -34,30 +34,29 @@ class _UpdateMatchState extends State<UpdateMatch> {
         ],
         type: StepperType.vertical,
         controlsBuilder: (BuildContext context, ControlsDetails controlsDetails) {
-          return Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: Colors.green[300],
-            ),
-            child: Column(
-              children: <Widget>[
-                ElevatedButton(
-                  onPressed: controlsDetails.onStepContinue,
-                  child: const Text(
-                    "Continue",
-                    style: TextStyle(color: Colors.white),
-                  ),
+          return Column(
+            children: <Widget>[
+              ElevatedButton(
+                onPressed: () {setState(() {
+                  print(_currentStep.toString());
+                  _currentStep > 2? _currentStep : _currentStep + 1;
+                });},
+                child: const Text(
+                  "Continue",
+                  style: TextStyle(color: Colors.white),
                 ),
-                const SizedBox(height: 16,),
-                ElevatedButton(
-                  onPressed: controlsDetails.onStepCancel,
-                  child: const Text(
-                    "Cancel",
-                    style: TextStyle(color: Colors.white),
-                  ),
+              ),
+              const SizedBox(height: 16,),
+              ElevatedButton(
+                onPressed: () {setState(() {
+                  _currentStep = _currentStep ==0 ? _currentStep : _currentStep - 1;
+                });},
+                child: const Text(
+                  "Cancel",
+                  style: TextStyle(color: Colors.white),
                 ),
-              ],
-            ),
+              ),
+            ],
           );
         },
       ),

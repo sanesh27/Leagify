@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'package:http/http.dart' as client;
 
-import 'package:http/http.dart' as http;
+
+
 import 'package:leagify/models/login_request.dart';
 import 'package:leagify/config.dart';
 import 'package:leagify/models/login_response_model.dart';
@@ -9,24 +11,31 @@ import 'package:leagify/models/player_stats.model.dart';
 import 'package:leagify/services/shared_services.dart';
 
 import '../models/result_model.dart';
+import 'package:connectivity/connectivity.dart';
+
 
 class APIService {
-  static var client = http.Client();
 
 
   static Future<bool> login(LoginRequestModel model) async {
     Map<String, String> requestHeaders = {'Content-Type': 'application/json'};
-
-    var url = Uri.http(Config.apiURL, Config.loginAPI);
-    var response = await client.post(url,
-        headers: requestHeaders, body: jsonEncode(model.toJson()));
-
-    if (response.statusCode == 200) {
-      await SharedService.setLoginDetails(loginResponsejson(response.body));
-      return true;
-    } else {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
       return false;
+    }else{
+      var url = Uri.http(Config.apiURL, Config.loginAPI);
+      var response = await client.post(url,
+          headers: requestHeaders, body: jsonEncode(model.toJson()));
+      if (response.statusCode == 200) {
+        await SharedService.setLoginDetails(loginResponsejson(response.body));
+        return true;
+      } else {
+        return false;
+      }
     }
+
+
+
   }
 
   static Future<bool> players() async {
