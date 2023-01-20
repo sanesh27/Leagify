@@ -18,7 +18,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../models/player_stats.model.dart';
 
-
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -30,8 +29,6 @@ class _HomeScreenState extends State<HomeScreen> {
   // final Users userLogin;
 
   var imageData;
-
-
 
   Future<void> signOut(context) async {
     await APICacheManager().deleteCache("login_details");
@@ -46,27 +43,25 @@ class _HomeScreenState extends State<HomeScreen> {
     String value = jsonData.containsKey(key) ? jsonData[key] : "No Key";
     return value; // Output: "value2"
   }
+
   bool _isAdmin = false;
 
-
-
-@override
+  @override
   void initState() {
     // TODO: implement initState
 
-  _loadData();
+    _loadData();
 
     super.initState();
     APICacheDBModel(key: 'player_images', syncData: 'player_images');
   }
 
   _loadData() async {
-  var data = await SharedService.cachedPlayerImages();
-  setState(() {
-    imageData = data;
-  });
+    var data = await SharedService.cachedPlayerImages();
+    setState(() {
+      imageData = data;
+    });
   }
-
 
   @override
   Widget build(BuildContext buildContext) {
@@ -88,17 +83,20 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Padding(padding: const EdgeInsets.all(8),child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Welcome,",
-                            style: kGreetingStyle,
-                          ),
-                          _userProfile(),
-                        ],
-                      ),),
+                      Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Welcome,",
+                              style: kGreetingStyle,
+                            ),
+                            _userProfile(),
+                          ],
+                        ),
+                      ),
                       IconButton(
                           onPressed: () {
                             setState(() {
@@ -116,21 +114,32 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(
                   height: 40,
                 ),
-
-                Padding(padding: const EdgeInsets.all(8),child: Text(
-                  "Standings",
-                  style: kLargeSubtitle.copyWith(color: kBrandColor),
-                  textAlign: TextAlign.end,
-                ),),
-                Padding(padding: const EdgeInsets.all(8),child: _standingTable(constraints.maxWidth, constraints.maxHeight),),
-                Padding(padding: const EdgeInsets.all(8),child: Text(
-                  "Statistics",
-                  style: kLargeSubtitle.copyWith(color: kBrandColor),
-                  textAlign: TextAlign.end,
-                ),),
-                Padding(padding: const EdgeInsets.all(8),child: _goalsTable(constraints.maxWidth, constraints.maxHeight),),
-
-
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Text(
+                    "Standings",
+                    style: kLargeSubtitle.copyWith(color: kBrandColor),
+                    textAlign: TextAlign.end,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: _standingTable(
+                      constraints.maxWidth, constraints.maxHeight),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Text(
+                    "Statistics",
+                    style: kLargeSubtitle.copyWith(color: kBrandColor),
+                    textAlign: TextAlign.end,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child:
+                      _goalsTable(constraints.maxWidth, constraints.maxHeight),
+                ),
               ],
             ),
           ),
@@ -145,7 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
         builder:
             (BuildContext context, AsyncSnapshot<LoginResponseModel?> model) {
           if (model.hasData) {
-            _isAdmin = model.data!.email == "kiran.silwal" ? true : false;
+            _isAdmin = model.data!.email == "kiran.silwal" || model.data!.email == "niraj.shrestha" || model.data!.email == "samin.maharjan"  ? true : false;
             return Text(
               '${model.data!.name}!',
               style: kHeading(const Color(0xFF3AA365)),
@@ -183,6 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget matchCards(AsyncSnapshot<List<MatchList>> model, int index,
       double width, double height) {
+    int gameId = model.data![index].gameId!;
     DateTime schedule = model.data![index].schedule!;
     String gameweek = model.data![index].gameweek.toString();
     String team1 = model.data![index].team1.toString();
@@ -194,7 +204,6 @@ class _HomeScreenState extends State<HomeScreen> {
     List<Score?> score = model.data![index].scores!;
     Map<String, int> goalSum = {};
 
-
     return SizedBox(
       width: width * 0.8,
       height: height * 0.4,
@@ -202,53 +211,96 @@ class _HomeScreenState extends State<HomeScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         elevation: 1,
         child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Expanded(
-                  flex: 10,
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                flex: 10,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: _team(team1, height, width),
+                    ),
+                    Expanded(
+                      flex: 2,
+                      child: _score(schedule, gameweek, team1Score, team2Score,
+                          status, height, width),
+                    ),
+                    Expanded(
+                      flex: 2,
+                      child: _team(team2, height, width),
+                    ),
+                  ],
+                ),
+              ),
+              const Expanded(
+                flex: 1,
+                child: Divider(),
+              ),
+              Expanded(
+                flex: 10,
+                child: SizedBox(
+                  height: height * 0.1,
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(flex: 2,child: _team(team1, height, width),),
                       Expanded(
                         flex: 2,
-                        child: _score(schedule, gameweek, team1Score, team2Score, status,
-                            height,width),
+                        child: _playerScores(
+                            score, hasScore, team1, TextAlign.start),
                       ),
-                      Expanded(flex: 2,child: _team(team2, height, width),),
+                      status == 1
+                          ? Icon(
+                              Icons.sports_soccer,
+                              color: kScoreFutureMatch,
+                            )
+                          : const SizedBox(
+                              height: 0,
+                              width: 0,
+                            ),
+                      Expanded(
+                        flex: 2,
+                        child: _playerScores(
+                            score, hasScore, team2, TextAlign.end),
+                      ),
                     ],
                   ),
                 ),
-                const Expanded(flex: 1,child: Divider(),),
-                Expanded(
-                  flex: 10,
-                  child: SizedBox(
-                    height: height * 0.1,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              ),
+              Expanded(
+                flex: 1,
+                child: _isAdmin
+                    ? Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Expanded(
-                          flex: 2,
-                          child: _playerScores(
-                              score, hasScore, team1, TextAlign.start),
-                        ),
-                        status == 1 ? Icon(Icons.sports_soccer,color: kScoreFutureMatch,) : const SizedBox(height: 0,width: 0,),
-                        Expanded(
-                          flex: 2,
-                          child: _playerScores(
-                              score, hasScore, team2, TextAlign.end),
-                        ),
+                        IconButton(
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => UpdateMatch(gameId : gameId)));
+                            },
+                            icon: const Icon(
+                              Icons.edit,
+                              size: 15,
+                            )),
+                        IconButton(
+                            onPressed: () {
+
+                            },
+                            icon: const Icon(
+                              Icons.edit_note,
+                              size: 15,
+                            )),
                       ],
-                    ),
-                  ),
-                ),
-                Expanded(flex: 1,child: _isAdmin ? IconButton(onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) =>  UpdateMatch()));
-                }, icon: const Icon(Icons.edit,size: 15,)) : Container(),)
-              ],
-            ),
+                    )
+                    : Container(),
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -266,9 +318,10 @@ class _HomeScreenState extends State<HomeScreen> {
         Expanded(
           flex: 2,
           child: SvgPicture.asset(
-          _logo(team),
-          width: width * 0.15, fit: BoxFit.contain,
-    ),
+            _logo(team),
+            width: width * 0.15,
+            fit: BoxFit.contain,
+          ),
         ),
         // SizedBox(
         //   height: 20,
@@ -290,11 +343,17 @@ class _HomeScreenState extends State<HomeScreen> {
     String dateString =
         DateFormat("EEE, MMM d").format(scheduledTime).toString();
 
-    if (now.year == scheduledTime.year && now.month == scheduledTime.month && now.day == scheduledTime.day) {
+    if (now.year == scheduledTime.year &&
+        now.month == scheduledTime.month &&
+        now.day == scheduledTime.day) {
       dateString = "Today";
-    } else if (now.year == scheduledTime.year && now.month == scheduledTime.month && (now.day - scheduledTime.day) == 1) {
+    } else if (now.year == scheduledTime.year &&
+        now.month == scheduledTime.month &&
+        (now.day - scheduledTime.day) == 1) {
       dateString = "Yesterday";
-    } else if (now.year == scheduledTime.year && now.month == scheduledTime.month && (scheduledTime.day - now.day) == 1) {
+    } else if (now.year == scheduledTime.year &&
+        now.month == scheduledTime.month &&
+        (scheduledTime.day - now.day) == 1) {
       dateString = "Tomorrow";
     }
 
@@ -320,17 +379,20 @@ class _HomeScreenState extends State<HomeScreen> {
               Text(
                 team1Score == 'null' ? '0' : team1Score,
                 style: kLargeSubtitle.copyWith(
-                    color: status == 1 ? kScoreStyle : kScoreFutureMatch,fontSize: width * 0.07),
+                    color: status == 1 ? kScoreStyle : kScoreFutureMatch,
+                    fontSize: width * 0.07),
               ),
               Text(
                 ":",
                 style: kLargeSubtitle.copyWith(
-                    color: status == 1 ? kScoreStyle : kScoreFutureMatch,fontSize: width * 0.07),
+                    color: status == 1 ? kScoreStyle : kScoreFutureMatch,
+                    fontSize: width * 0.07),
               ),
               Text(
                 team2Score == 'null' ? '0' : team2Score,
                 style: kLargeSubtitle.copyWith(
-                    color: status == 1 ? kScoreStyle : kScoreFutureMatch,fontSize: width * 0.07),
+                    color: status == 1 ? kScoreStyle : kScoreFutureMatch,
+                    fontSize: width * 0.07),
               ),
             ],
           ),
@@ -345,13 +407,13 @@ class _HomeScreenState extends State<HomeScreen> {
       List<Score?> newScore = matchPlayerScores
           .where((e) => e!.team.toString() == team && e.statsType == "Goal")
           .toList();
-      newScore.sort((a,b) => a!.statsTime!.compareTo(b!.statsTime!));
+      newScore.sort((a, b) => a!.statsTime!.compareTo(b!.statsTime!));
       return ListView.builder(
         itemCount: newScore.length,
         scrollDirection: Axis.vertical,
         itemBuilder: (context, index) {
           return Text(
-            "${newScore[index]!.playerName!} ${newScore[index]!.statsTime}'" ,
+            "${newScore[index]!.playerName!} ${newScore[index]!.statsTime}'",
             textAlign: align,
             style: kSmallSubtitle.copyWith(fontSize: 12),
           );
@@ -373,15 +435,27 @@ class _HomeScreenState extends State<HomeScreen> {
           if (model.hasData) {
             model.data!.sort((a, b) => b.points.compareTo(a.points));
             return Card(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              child: Padding(padding: const EdgeInsets.all(8.0),child: Column(
-                children: [
-                  _tableRow("Team","GP","W","D","L","Pts",width,true),
-                  for (var items in model.data!) _tableRow(items.teamName.toString(),items.played.toString(),items.win.toString(),items.draw.toString(),items.loss.toString(),items.points.toString(),width,false),
-                ],
-              ),)
-            );
-
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      _tableRow(
+                          "Team", "GP", "W", "D", "L", "Pts", width, true),
+                      for (var items in model.data!)
+                        _tableRow(
+                            items.teamName.toString(),
+                            items.played.toString(),
+                            items.win.toString(),
+                            items.draw.toString(),
+                            items.loss.toString(),
+                            items.points.toString(),
+                            width,
+                            false),
+                    ],
+                  ),
+                ));
           } else {
             return const Center(child: CircularProgressIndicator());
           }
@@ -391,116 +465,197 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _goalsTable(double width, double height) {
     return FutureBuilder(
         future: APIService.getGoals(),
-        builder:
-            (BuildContext context, AsyncSnapshot<List<PlayerStats>> statsModel) {
+        builder: (BuildContext context,
+            AsyncSnapshot<List<PlayerStats>> statsModel) {
           if (statsModel.hasData) {
             List<PlayerStats> goalsSort = statsModel.data!;
             List<PlayerStats> assistSort = [];
-            for (var element in goalsSort) { assistSort.add(element);}
+            for (var element in goalsSort) {
+              assistSort.add(element);
+            }
             goalsSort.sort((a, b) => b.goal.compareTo(a.goal));
             assistSort.sort((a, b) => b.assists.compareTo(a.assists));
 
             return Column(
               children: [
                 Card(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    child: Padding(padding: const EdgeInsets.all(8.0),child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(padding: const EdgeInsets.all(8),child: Text(
-                          "Goals",
-                          style: kLargeSubtitle.copyWith(color: kBrandColor),
-                          textAlign: TextAlign.start,
-                        ),),
-                        _tableRowPlayers("Player","Goals",width,true),
-                        for (var items in goalsSort.where((element) => element.goal > 0)) _tableRowPlayers(items.name.toString(),items.goal.toString(),width,false),
-                        const SizedBox(height: 40,),
-                        Padding(padding: const EdgeInsets.all(8),child: Text(
-                          "Assists",
-                          style: kLargeSubtitle.copyWith(color: kBrandColor),
-                          textAlign: TextAlign.start,
-                        ),),
-                        _tableRowPlayers("Player","Assists",width,true),
-                        for (var items in assistSort.where((element) => element.assists > 0)) _tableRowPlayers(items.name.toString(),items.assists.toString().toString(),width,false),
-                      ],
-                    ),)
-                ),
-
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Text(
+                              "Goals",
+                              style:
+                                  kLargeSubtitle.copyWith(color: kBrandColor),
+                              textAlign: TextAlign.start,
+                            ),
+                          ),
+                          _tableRowPlayers("Player", "Goals", width, true),
+                          for (var items
+                              in goalsSort.where((element) => element.goal > 0))
+                            _tableRowPlayers(items.name.toString(),
+                                items.goal.toString(), width, false),
+                          const SizedBox(
+                            height: 40,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Text(
+                              "Assists",
+                              style:
+                                  kLargeSubtitle.copyWith(color: kBrandColor),
+                              textAlign: TextAlign.start,
+                            ),
+                          ),
+                          _tableRowPlayers("Player", "Assists", width, true),
+                          for (var items in assistSort
+                              .where((element) => element.assists > 0))
+                            _tableRowPlayers(
+                                items.name.toString(),
+                                items.assists.toString().toString(),
+                                width,
+                                false),
+                        ],
+                      ),
+                    )),
               ],
             );
-
           } else {
             return const Center(child: CircularProgressIndicator());
           }
         });
   }
 
-
-  Widget _tableRow(String teamName,String played, String win, String draw, String loss, String points,double width, bool head){
+  Widget _tableRow(String teamName, String played, String win, String draw,
+      String loss, String points, double width, bool head) {
     Color textColor = head ? kScoreFutureMatch : kScoreStyle;
 
-   getLogo(String teamName){
-    return SvgPicture.asset(
-      _logo(teamName),
-      width: 40,
-    );}
+    getLogo(String teamName) {
+      return SvgPicture.asset(
+        _logo(teamName),
+        width: 40,
+      );
+    }
+
     return Column(
       children: [
-        Padding(padding: const EdgeInsets.all(4),child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(flex:1, child: _logo(teamName) == "No Key" ? Container(width: 40,) : getLogo(teamName)),
-            Expanded(flex:2, child: Text(teamName,style: kNormalSize.copyWith(color: textColor),)),
-            Expanded(flex:1, child: Text(played.toString(),style: kNormalSize.copyWith(color: textColor),)),
-            Expanded(flex:1, child:  Text(win.toString(),style: kNormalSize.copyWith(color: textColor),)),
-            Expanded(flex:1, child: Text(draw.toString(),style: kNormalSize.copyWith(color: textColor),)),
-            Expanded(flex:1, child: Text(loss.toString(),style: kNormalSize.copyWith(color: textColor),)),
-            Expanded(flex:1, child: Text(points.toString(),style: kNormalSize.copyWith(color: textColor),))
-          ],
-        ),),
+        Padding(
+          padding: const EdgeInsets.all(4),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                  flex: 1,
+                  child: _logo(teamName) == "No Key"
+                      ? Container(
+                          width: 40,
+                        )
+                      : getLogo(teamName)),
+              Expanded(
+                  flex: 2,
+                  child: Text(
+                    teamName,
+                    style: kNormalSize.copyWith(color: textColor),
+                  )),
+              Expanded(
+                  flex: 1,
+                  child: Text(
+                    played.toString(),
+                    style: kNormalSize.copyWith(color: textColor),
+                  )),
+              Expanded(
+                  flex: 1,
+                  child: Text(
+                    win.toString(),
+                    style: kNormalSize.copyWith(color: textColor),
+                  )),
+              Expanded(
+                  flex: 1,
+                  child: Text(
+                    draw.toString(),
+                    style: kNormalSize.copyWith(color: textColor),
+                  )),
+              Expanded(
+                  flex: 1,
+                  child: Text(
+                    loss.toString(),
+                    style: kNormalSize.copyWith(color: textColor),
+                  )),
+              Expanded(
+                  flex: 1,
+                  child: Text(
+                    points.toString(),
+                    style: kNormalSize.copyWith(color: textColor),
+                  ))
+            ],
+          ),
+        ),
         const Divider()
       ],
     );
   }
-Widget _tableRowPlayers(String name,String goals,double width,bool head){
-  Color textColor = head ? kScoreFutureMatch : kScoreStyle;
 
-  Map<String,dynamic> newData = imageData;
-  // print(newData['Sanish']);
+  Widget _tableRowPlayers(String name, String goals, double width, bool head) {
+    Color textColor = head ? kScoreFutureMatch : kScoreStyle;
 
-hasImage(name){
-  if (newData.containsKey(name)){
-    return 1;
-  }else{
-    return "No Key";
-  }
-}
+    Map<String, dynamic> newData = imageData;
+    // print(newData['Sanish']);
 
-   getLogo(String teamName){
+    hasImage(name) {
+      if (newData.containsKey(name)) {
+        return 1;
+      } else {
+        return "No Key";
+      }
+    }
 
-    return Row(
-      children: [
-        CircleAvatar(backgroundImage: CachedNetworkImageProvider(newData[teamName]),radius: 40,),
-     const SizedBox(width: 10,),
-     Text(teamName,style: kNormalSize.copyWith(color: textColor)),
-      ],
-    );
-   }
+    getLogo(String teamName) {
+      return Row(
+        children: [
+          CircleAvatar(
+            backgroundImage: CachedNetworkImageProvider(newData[teamName]),
+            radius: 40,
+          ),
+          const SizedBox(
+            width: 10,
+          ),
+          Text(teamName, style: kNormalSize.copyWith(color: textColor)),
+        ],
+      );
+    }
+
     return Column(
       children: [
-        Padding(padding: const EdgeInsets.all(4),child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(flex:5, child: hasImage(name) == "No Key" ? Container(width: 0,) : getLogo(name)),
-            Expanded(flex:1, child: Text(goals.toString(),style: kNormalSize.copyWith(color: textColor),)),
-          ],
-        ),),
+        Padding(
+          padding: const EdgeInsets.all(4),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                  flex: 5,
+                  child: hasImage(name) == "No Key"
+                      ? Container(
+                          width: 0,
+                        )
+                      : getLogo(name)),
+              Expanded(
+                  flex: 1,
+                  child: Text(
+                    goals.toString(),
+                    style: kNormalSize.copyWith(color: textColor),
+                  )),
+            ],
+          ),
+        ),
         const Divider()
       ],
     );
   }
   // }
 }
-
-

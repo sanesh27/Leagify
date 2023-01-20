@@ -8,5 +8,9 @@ class Config {
   static const String standings = "/api/standings";
   static const String updateMatch = "/api/game";
   static const String goals = "/api/goals";
+  static const String postStats = "/api/update-player-stats";
+  static const String playerByTeam = "api/players/team/";
+  static const String editGame = "/api/game/";
+  static const String getGame = "/api/getgame/";
 
 }

@@ -1,4 +1,7 @@
 PODS:
+  - connectivity_macos (0.0.1):
+    - FlutterMacOS
+    - Reachability
   - Firebase/Auth (10.3.0):
     - Firebase/CoreOnly
     - FirebaseAuth (~> 10.3.0)
@@ -46,6 +49,7 @@ PODS:
   - path_provider_macos (0.0.1):
     - FlutterMacOS
   - PromisesObjC (2.1.1)
+  - Reachability (3.2)
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -54,6 +58,7 @@ PODS:
     - FMDB (>= 2.7.5)
 
 DEPENDENCIES:
+  - connectivity_macos (from `Flutter/ephemeral/.symlinks/plugins/connectivity_macos/macos`)
   - firebase_auth (from `Flutter/ephemeral/.symlinks/plugins/firebase_auth/macos`)
   - firebase_core (from `Flutter/ephemeral/.symlinks/plugins/firebase_core/macos`)
   - FlutterMacOS (from `Flutter/ephemeral`)
@@ -71,8 +76,11 @@ SPEC REPOS:
     - GoogleUtilities
     - GTMSessionFetcher
     - PromisesObjC
+    - Reachability
 
 EXTERNAL SOURCES:
+  connectivity_macos:
+    :path: Flutter/ephemeral/.symlinks/plugins/connectivity_macos/macos
   firebase_auth:
     :path: Flutter/ephemeral/.symlinks/plugins/firebase_auth/macos
   firebase_core:
@@ -87,6 +95,7 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/sqflite/macos
 
 SPEC CHECKSUMS:
+  connectivity_macos: 5dae6ee11d320fac7c05f0d08bd08fc32b5514d9
   Firebase: f92fc551ead69c94168d36c2b26188263860acd9
   firebase_auth: c6e7c32d1b546266e34a991986e3abf546a31638
   firebase_core: 651a84636254f758b9b9367f27bef0801a3855a2
@@ -99,6 +108,7 @@ SPEC CHECKSUMS:
   GTMSessionFetcher: c9e714f7eec91a55641e2bab9f45fd83a219b882
   path_provider_macos: 05fb0ef0cedf3e5bd179b9e41a638682b37133ea
   PromisesObjC: ab77feca74fa2823e7af4249b8326368e61014cb
+  Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
   shared_preferences_foundation: 3d2c799fb2ff809e53f07a8517d24c441ad22e65
   sqflite: a5789cceda41d54d23f31d6de539d65bb14100ea
 

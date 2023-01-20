@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as client;
+import 'package:leagify/models/game_response.dart';
 
 
 
@@ -8,8 +9,10 @@ import 'package:leagify/config.dart';
 import 'package:leagify/models/login_response_model.dart';
 import 'package:leagify/models/match_list.dart';
 import 'package:leagify/models/player_stats.model.dart';
+import 'package:leagify/models/stats_post.dart';
 import 'package:leagify/services/shared_services.dart';
 
+import '../models/player.dart';
 import '../models/result_model.dart';
 import 'package:connectivity/connectivity.dart';
 
@@ -34,9 +37,21 @@ class APIService {
       }
     }
 
+  }
 
+
+   static Future<String> postStats (StatsPost jsondata) async {
+     Map<String, String> requestHeaders = {'Content-Type': 'application/json'};
+     var url = Uri.http(Config.apiURL, Config.postStats);
+     var response = await client.post(url,
+         headers: requestHeaders, body: jsonEncode(jsondata.toJson()));
+     print(jsonEncode(jsondata.toJson()));
+     return response.statusCode.toString();
 
   }
+
+
+
 
   static Future<bool> players() async {
     Map<String, String> requestHeaders = {'Content-Type': 'application/json'};
@@ -70,6 +85,49 @@ class APIService {
       List<dynamic> listResponse = jsonDecode(response.body);
       List<MatchList> listMatch =
           List<MatchList>.from(listResponse.map((e) => MatchList.fromJson(e)));
+      return listMatch;
+    } else {
+      return [];
+    }
+  }
+
+
+  static Future<GameResponse> getGameResponse(id) async {
+    // var loginDetails = await SharedService.loginDetails();
+    // print(loginDetails!.jwt);
+    Map<String, String> requestHeaders = {
+      'content-Type': 'application/json',
+      // 'authorization' : '${loginDetails!.jwt}'
+    };
+    var url = Uri.http(Config.apiURL, Config.getGame + id.toString());
+    var response = await client.get(url, headers: requestHeaders);
+
+    if (response.statusCode == 200) {
+      var listResponse = jsonDecode(response.body);
+      GameResponse listMatch =
+          GameResponse.fromJson(listResponse);
+      return listMatch;
+    } else {
+      return GameResponse(gameId: 0, team1Name: '', team2Name: '', team1Id: 0, team2Id: 0);
+    }
+  }
+
+
+  static Future<List<Player>> getPlayers(int teamId) async {
+    // var loginDetails = await SharedService.loginDetails();
+    // print(loginDetails!.jwt);
+    Map<String, String> requestHeaders = {
+      'content-Type': 'application/json',
+      // 'authorization' : '${loginDetails!.jwt}'
+    };
+    // print(teamId);
+    var url = Uri.http(Config.apiURL, Config.playerByTeam + teamId!.toString());
+    var response = await client.get(url, headers: requestHeaders);
+
+    if (response.statusCode == 200) {
+      var listResponse = jsonDecode(response.body);
+      List<Player> listMatch =
+          List<Player>.from(listResponse.map((e) => Player.fromJson(e)));
       return listMatch;
     } else {
       return [];
