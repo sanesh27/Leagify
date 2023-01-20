@@ -154,7 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
         builder:
             (BuildContext context, AsyncSnapshot<LoginResponseModel?> model) {
           if (model.hasData) {
-            _isAdmin = model.data!.email == "kiran.silwal" || model.data!.email == "niraj.shrestha" || model.data!.email == "samin.maharjan"  ? true : false;
+            _isAdmin = model.data!.email == "kiran.silwal" || model.data!.email == "niraj.shrestha" || model.data!.email == "samin.maharjan" || model.data!.email == "sanish.maharjan"  ? true : false;
             return Text(
               '${model.data!.name}!',
               style: kHeading(const Color(0xFF3AA365)),
