@@ -26,13 +26,16 @@ class APIService {
     if (connectivityResult == ConnectivityResult.none) {
       return false;
     }else{
+      print("Connected to the internet");
       var url = Uri.http(Config.apiURL, Config.loginAPI);
       var response = await client.post(url,
           headers: requestHeaders, body: jsonEncode(model.toJson()));
       if (response.statusCode == 200) {
+
         await SharedService.setLoginDetails(loginResponsejson(response.body));
         return true;
       } else {
+        print("user pass not right");
         return false;
       }
     }

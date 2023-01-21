@@ -176,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
               height: height * 0.4,
               child: ListView.builder(
                 controller: ScrollController(
-                    initialScrollOffset: width * 0.8 * completedGames),
+                    initialScrollOffset: width * 0.8 * (completedGames - 1)),
                 scrollDirection: Axis.horizontal,
                 itemCount: model.data!.length,
                 itemBuilder: (BuildContext context, int index) {
@@ -273,32 +273,22 @@ class _HomeScreenState extends State<HomeScreen> {
               Expanded(
                 flex: 1,
                 child: _isAdmin
-                    ? Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        IconButton(
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => UpdateMatch(gameId : gameId)));
-                            },
-                            icon: const Icon(
-                              Icons.edit,
-                              size: 15,
-                            )),
-                        IconButton(
-                            onPressed: () {
-
-                            },
-                            icon: const Icon(
-                              Icons.edit_note,
-                              size: 15,
-                            )),
-                      ],
-                    )
+                    ? IconButton(
+                  color: kBrandColor,
+                        alignment: Alignment.topCenter,
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => UpdateMatch(gameId : gameId)));
+                        },
+                        icon: const Icon(
+                          Icons.edit,
+                          size: 20,
+                        ))
                     : Container(),
-              )
+              ),
+              SizedBox(height: 10,)
             ],
           ),
         ),

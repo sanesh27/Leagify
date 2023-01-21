@@ -190,7 +190,7 @@ class _UpdateMatchState extends State<UpdateMatch> {
             ElevatedButton(
               child: Text('OK'),
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
               },
             ),
           ],
