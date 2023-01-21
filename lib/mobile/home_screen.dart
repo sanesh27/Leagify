@@ -73,9 +73,12 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.all(0),
           child: SingleChildScrollView(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                 SizedBox(
+                  height: height * 0.05,
+                ),
                 SizedBox(
                   height: height * 0.1,
                   width: constraints.maxWidth,
@@ -93,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               "Welcome,",
                               style: kGreetingStyle,
                             ),
-                            _userProfile(),
+                            _userProfile(height),
                           ],
                         ),
                       ),
@@ -107,9 +110,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
+                const SizedBox(
+                  height: 16,
+                ),
                 _matchList(constraints.maxWidth, constraints.maxHeight),
                 const SizedBox(
-                  height: 24,
+                  height: 30,
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8),
@@ -145,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  Widget _userProfile() {
+  Widget _userProfile(double height) {
     return FutureBuilder(
         future: SharedService.loginDetails(),
         builder:
@@ -154,7 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
             _isAdmin = model.data!.email == "kiran.silwal" || model.data!.email == "niraj.shrestha" || model.data!.email == "samin.maharjan" || model.data!.email == "sanish.maharjan"  ? true : false;
             return Text(
               '${model.data!.name}!',
-              style: kHeading(const Color(0xFF3AA365)),
+              style: kHeading(const Color(0xFF3AA365), height),
             );
           } else {
             return const Center(child: CircularProgressIndicator.adaptive());

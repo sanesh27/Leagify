@@ -14,10 +14,10 @@ Color kButtonTextColor = const Color(0xFFEEEEEE);
 Color kButtonColor = const Color(0xFF0065CC);
 Color kGreetingColor = const Color(0xFF888888);
 Color kDescriptionStyle = const Color(0xFFAAAAAA);
-TextStyle kHeading(Color color) {
+TextStyle kHeading(Color color,double height) {
   return TextStyle(
       fontFamily: "Helvetica Neue",
-      fontSize: 34.0,
+      fontSize: height * 0.04,
       color: color,
       fontWeight: FontWeight.bold);
 }

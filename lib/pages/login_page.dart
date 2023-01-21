@@ -55,7 +55,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   Text(
                     "Leagify!",
-                    style: kHeading(const Color(0xFF3AA365)),
+                    style: kHeading(const Color(0xFF3AA365),height),
                   ),
                 ],
               ),
@@ -168,9 +168,6 @@ class _LoginPageState extends State<LoginPage> {
                         borderColor: kCanvasColor
                     ),
                   ),
-                  const SizedBox(
-                    height: 10,
-                  )
                 ],
               ),
             ),
