@@ -348,6 +348,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Column(
           children: [
@@ -485,11 +486,11 @@ class _HomeScreenState extends State<HomeScreen> {
                               textAlign: TextAlign.start,
                             ),
                           ),
-                          _tableRowPlayers("Player", "Goals", width, true),
+                          _tableRowPlayers("Player", "Goals", width, true,"None"),
                           for (var items
                               in goalsSort.where((element) => element.goal > 0))
                             _tableRowPlayers(items.name.toString(),
-                                items.goal.toString(), width, false),
+                                items.goal.toString(), width, false,items.team),
                           const SizedBox(
                             height: 40,
                           ),
@@ -502,14 +503,14 @@ class _HomeScreenState extends State<HomeScreen> {
                               textAlign: TextAlign.start,
                             ),
                           ),
-                          _tableRowPlayers("Player", "Assists", width, true),
+                          _tableRowPlayers("Player", "Assists", width, true,"None"),
                           for (var items in assistSort
                               .where((element) => element.assists > 0))
                             _tableRowPlayers(
                                 items.name.toString(),
                                 items.assists.toString().toString(),
                                 width,
-                                false),
+                                false,items.team),
                         ],
                       ),
                     )),
@@ -590,7 +591,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _tableRowPlayers(String name, String goals, double width, bool head) {
+  Widget _tableRowPlayers(String name, String goals, double width, bool head,String team) {
     Color textColor = head ? kScoreFutureMatch : kScoreStyle;
 
     Map<String, dynamic> newData = imageData;
@@ -604,7 +605,7 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     }
 
-    getLogo(String teamName) {
+    getLogo(String teamName,String team) {
       return Row(
         children: [
           CircleAvatar(
@@ -614,7 +615,27 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(
             width: 10,
           ),
-          Text(teamName, style: kNormalSize.copyWith(color: textColor)),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(teamName, style: kLargeSubtitle.copyWith(color: textColor)),
+              SizedBox(height: 10,),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+
+                  SvgPicture.asset(
+                    _logo(team),
+                    width: 25,
+                    fit: BoxFit.contain,
+                    color: kGreetingColor,
+                  ),
+                  SizedBox(width: 10,),
+                  Text(team, style: kNormalSize.copyWith(fontSize: 12.0,color: kGreetingColor)),
+                ],
+              ),
+            ],
+          ),
         ],
       );
     }
@@ -633,12 +654,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       ? Container(
                           width: 0,
                         )
-                      : getLogo(name)),
+                      : getLogo(name,team)),
               Expanded(
                   flex: 1,
                   child: Text(
                     goals.toString(),
-                    style: kNormalSize.copyWith(color: textColor),
+                    style: kLargeSubtitle.copyWith(color: textColor),
                   )),
             ],
           ),

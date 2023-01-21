@@ -203,7 +203,7 @@ class APIService {
       List<PlayerStats> playerStats = [];
       newResponse.forEach((key, value) {
 
-      playerStats.add(PlayerStats(name: key, goal: newResponse[key]["Goal"] ?? 0, assists: newResponse[key]["Assists"] ?? 0, yellow: newResponse[key]["Yellow"] ?? 0, red: newResponse[key]["Red"] ?? 0 ));
+      playerStats.add(PlayerStats(name: key, goal: newResponse[key]["Goal"] ?? 0, assists: newResponse[key]["Assists"] ?? 0, yellow: newResponse[key]["Yellow"] ?? 0, red: newResponse[key]["Red"] ?? 0,team: newResponse[key]["team"] ));
 
       });
 
