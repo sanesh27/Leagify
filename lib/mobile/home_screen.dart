@@ -316,13 +316,13 @@ class _HomeScreenState extends State<HomeScreen> {
         // SizedBox(
         //   height: 20,
         // ),
-        Expanded(
-          flex: 1,
-          child: Text(team,
-              style: kNormalSize.copyWith(
-                fontWeight: FontWeight.bold,
-              )),
-        ),
+        // Expanded(
+        //   flex: 1,
+        //   child: Text(team,
+        //       style: kNormalSize.copyWith(
+        //         fontWeight: FontWeight.bold,
+        //       )),
+        // ),
       ],
     );
   }
@@ -628,7 +628,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     _logo(team),
                     width: 25,
                     fit: BoxFit.contain,
-                    color: kGreetingColor,
+
                   ),
                   SizedBox(width: 10,),
                   Text(team, style: kNormalSize.copyWith(fontSize: 12.0,color: kGreetingColor)),
