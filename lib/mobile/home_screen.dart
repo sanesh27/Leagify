@@ -77,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(
-                  height: height * 0.2,
+                  height: height * 0.1,
                   width: constraints.maxWidth,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -107,12 +107,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(
-                  height: 16,
-                ),
                 _matchList(constraints.maxWidth, constraints.maxHeight),
                 const SizedBox(
-                  height: 40,
+                  height: 24,
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8),
@@ -309,7 +306,7 @@ class _HomeScreenState extends State<HomeScreen> {
           flex: 2,
           child: SvgPicture.asset(
             _logo(team),
-            width: width * 0.15,
+            width: width * 0.20,
             fit: BoxFit.contain,
           ),
         ),
