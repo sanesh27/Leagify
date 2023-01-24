@@ -24,6 +24,7 @@ class _UpdateMatchState extends State<UpdateMatch> {
    List<Player> players = [];
    List<Team> teams = [];
    Player? _selectedTeam;
+   Player? _selected2Team;
    final _controller = TextEditingController();
    List<Map<String,int>> stats = [
      {
@@ -42,6 +43,9 @@ class _UpdateMatchState extends State<UpdateMatch> {
 
    void onTeamSelected(value) {
        _selectedTeam = value;
+   }
+   void onTeam2Selected(value) {
+       _selected2Team = value;
    }
    void onStatsSelected(value) {
      _selectedStats = value;
@@ -93,6 +97,11 @@ class _UpdateMatchState extends State<UpdateMatch> {
                     isActive: _currentStep >= 1,
                   ),
                   Step(
+                    title: const Text("Choose the player that assisted." ),
+                    content:CreateDropDown(teams: players,onItemSelected:onTeam2Selected),
+                    isActive: _currentStep >= 2,
+                  ),
+                  Step(
                     title:  Text(_selectedStats?.keys == null ? "choose time" :" ${_selectedStats?.keys} at what time?"),
                     content:  TextField (
                       controller: _controller,
@@ -107,7 +116,7 @@ class _UpdateMatchState extends State<UpdateMatch> {
                         });
                     },
                     )  ,
-                    isActive: _currentStep == 1,
+                    isActive: _currentStep >= 3,
                   ),
                 ],
                 type: StepperType.vertical,
@@ -121,7 +130,7 @@ class _UpdateMatchState extends State<UpdateMatch> {
                           onPressed: () {
                             setState(() {
 
-                              if (_currentStep >= 2) {
+                              if (_currentStep >= 3) {
                                 print("Step = ${_currentStep}");
                                 _currentStep = _currentStep;
                                 print(minutes.toString());
@@ -162,10 +171,19 @@ class _UpdateMatchState extends State<UpdateMatch> {
                     minutes = int.parse(_controller.text);
                     print(minutes!.runtimeType.toString() + ' ${_selectedTeam!.id.runtimeType}' + ' ${_selectedStats!.values.first.runtimeType}' + ' ${widget.gameId}');
                     StatsPost postdata = StatsPost(statstype: _selectedStats!.values.first, player: _selectedTeam!.id, game: widget.gameId, stats_time: minutes!);
+                    var queries = [];
+                    queries.add(postdata);
+                    if (_selected2Team != null){
+                      StatsPost postAssistData = StatsPost(statstype: 2, player: _selected2Team!.id, game: widget.gameId, stats_time: minutes!);
+                      queries.add(postAssistData);
+                    }
+
 
                     setState(() {
-                      APIService.postStats(postdata).then((value) => _popUp(value));
-                      Navigator.pop(context);
+
+                      queries.forEach((element) { APIService.postStats(element); });
+                      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+
                     });
                   });
                 },

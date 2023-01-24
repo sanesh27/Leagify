@@ -48,7 +48,6 @@ class APIService {
      var url = Uri.http(Config.apiURL, Config.postStats);
      var response = await client.post(url,
          headers: requestHeaders, body: jsonEncode(jsondata.toJson()));
-     print(jsonEncode(jsondata.toJson()));
      return response.statusCode.toString();
 
   }
