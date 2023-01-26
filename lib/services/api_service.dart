@@ -170,6 +170,9 @@ class APIService {
         newResponse[key]["draw"] = newResponse[key]["draw"] ?? 0;
         newResponse[key]["played"] = newResponse[key]["played"] ?? 0;
         newResponse[key]["loss"] = newResponse[key]["loss"] ?? 0;
+        newResponse[key]["GF"] = newResponse[key]["GF"] ?? 0;
+        newResponse[key]["GA"] = newResponse[key]["GA"] ?? 0;
+        newResponse[key]["GD"] = (newResponse[key]["GF"] - newResponse[key]["GA"]) ?? 0;
         newResponse[key]["logoURL"] = logoURL;
         newResponse[key]["points"] = newResponse[key]["win"]* 3 + newResponse[key]["draw"] ;
 

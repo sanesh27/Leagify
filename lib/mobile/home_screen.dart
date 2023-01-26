@@ -357,7 +357,7 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         Column(
           children: [
-            Text(dateString, style: kLargeSubtitle),
+            FittedBox(child: Text(dateString, style: kLargeSubtitle)),
             Text(
               gameweek,
               style: kSmallSubtitle.copyWith(color: kDescriptionStyle),
@@ -429,7 +429,13 @@ class _HomeScreenState extends State<HomeScreen> {
         builder:
             (BuildContext context, AsyncSnapshot<List<TeamStanding>> model) {
           if (model.hasData) {
-            model.data!.sort((a, b) => b.points.compareTo(a.points));
+            model.data!.sort((a, b) {
+              if (a.points == b.points) {
+                return b.goalDifference.compareTo(a.goalDifference);
+              }
+              return b.points.compareTo(a.points);
+            });
+
             return Card(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16)),
@@ -438,7 +444,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     children: [
                       _tableRow(
-                          "Team", "GP", "W", "D", "L", "Pts", width, true),
+                          "Team", "GP", "W", "D", "L","GF","GA","GD","Pts", width, true),
                       for (var items in model.data!)
                         _tableRow(
                             items.teamName.toString(),
@@ -446,6 +452,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             items.win.toString(),
                             items.draw.toString(),
                             items.loss.toString(),
+                            items.goalsForward.toString(),
+                            items.goalsAgainst.toString(),
+                            items.goalDifference.toString(),
                             items.points.toString(),
                             width,
                             false),
@@ -528,7 +537,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _tableRow(String teamName, String played, String win, String draw,
-      String loss, String points, double width, bool head) {
+      String loss,String forward, String against,String difference, String points, double width, bool head) {
     Color textColor = head ? kScoreFutureMatch : kScoreStyle;
 
     getLogo(String teamName) {
@@ -554,10 +563,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       : getLogo(teamName)),
               Expanded(
                   flex: 2,
-                  child: Text(
-                    teamName,
-                    style: kNormalSize.copyWith(color: textColor),
+                  child: FittedBox(
+                    child: Text(
+                      teamName,
+                      style: kNormalSize.copyWith(color: textColor),
+                    ),
                   )),
+              Expanded(child: SizedBox(width: 10,)),
               Expanded(
                   flex: 1,
                   child: Text(
@@ -580,6 +592,24 @@ class _HomeScreenState extends State<HomeScreen> {
                   flex: 1,
                   child: Text(
                     loss.toString(),
+                    style: kNormalSize.copyWith(color: textColor),
+                  )),
+              Expanded(
+                  flex: 1,
+                  child: Text(
+                    forward.toString(),
+                    style: kNormalSize.copyWith(color: textColor),
+                  )),
+              Expanded(
+                  flex: 1,
+                  child: Text(
+                    against.toString(),
+                    style: kNormalSize.copyWith(color: textColor),
+                  )),
+              Expanded(
+                  flex: 1,
+                  child: Text(
+                    difference.toString(),
                     style: kNormalSize.copyWith(color: textColor),
                   )),
               Expanded(
