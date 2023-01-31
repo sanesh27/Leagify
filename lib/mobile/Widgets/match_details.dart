@@ -46,7 +46,7 @@ class _MatchDetailsState extends State<MatchDetails> {
                   flex: 6,
                   child: FutureBuilder(
                       future: _getVideoURL(),
-                      builder: (context, snapshot) {
+                      builder: (context, snapshot){
 
                         if (snapshot.hasData) {
                           return YoutubePlayer(
@@ -60,9 +60,8 @@ class _MatchDetailsState extends State<MatchDetails> {
 
                               });
 
-                            },
-                          );
-                        } else {
+        }
+                         else {
                           return const Center(
                               child: Text('No Match Details Yet'));
                         }
