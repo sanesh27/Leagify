@@ -557,14 +557,14 @@ class _HomeScreenState extends State<HomeScreen> {
                           width: 40,
                         )
                       : getLogo(teamName)),
-              FittedBox(
-                child: Expanded(
-                    flex: 2,
+              Expanded(
+                  flex: 2,
+                  child: FittedBox(
                     child: Text(
                       teamName,
                       style: kNormalSize.copyWith(color: textColor),
-                    )),
-              ),
+                    ),
+                  )),
               Expanded(child: SizedBox(width: 10,)),
               Expanded(
                   flex: 1,
