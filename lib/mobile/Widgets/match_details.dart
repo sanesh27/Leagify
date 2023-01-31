@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:leagify/services/api_service.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
@@ -19,6 +20,21 @@ class _MatchDetailsState extends State<MatchDetails> {
     _getVideoURL();
     // TODO: implement initState
     super.initState();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+  }
+
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
   }
 
   @override
@@ -26,6 +42,7 @@ class _MatchDetailsState extends State<MatchDetails> {
     return Material(
       child: LayoutBuilder(builder: (context, constraints) {
         double height = constraints.maxHeight;
+        double width = constraints.maxWidth;
         return Scaffold(
           body: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -39,9 +56,7 @@ class _MatchDetailsState extends State<MatchDetails> {
                     Navigator.pop(context);
                   }, icon: const Icon(Icons.arrow_back_ios)),
                 ),
-                SizedBox(
-                  height: height * 0.2,
-                ),
+
                 Expanded(
                   flex: 6,
                   child: FutureBuilder(
@@ -50,6 +65,7 @@ class _MatchDetailsState extends State<MatchDetails> {
 
                         if (snapshot.hasData) {
                           return YoutubePlayer(
+                            aspectRatio: (height - 20)/width,
                             controller: _controller,
                             showVideoProgressIndicator: true,
                             onReady: () {
@@ -58,7 +74,9 @@ class _MatchDetailsState extends State<MatchDetails> {
                               //   _controller.load(_getVideoURL(),startAt: 100);
                               //   _controller.play();
 
-                              });
+
+
+                            });
 
         }
                          else {
@@ -67,9 +85,6 @@ class _MatchDetailsState extends State<MatchDetails> {
                         }
                       }),
                 ),
-                SizedBox(
-                  height: height * 0.2,
-                )
               ],
             ),
           ),
@@ -84,6 +99,7 @@ class _MatchDetailsState extends State<MatchDetails> {
     _controller = YoutubePlayerController(
         initialVideoId: videoID!,
         flags: const YoutubePlayerFlags(
+
           autoPlay: false,
         ));
     return videoURL;
