@@ -12,5 +12,6 @@ class Config {
   static const String playerByTeam = "api/players/team/";
   static const String editGame = "/api/game/";
   static const String getGame = "/api/getgame/";
+  static const String matchDetails = "/api/matchdetails/";
 
 }

@@ -72,128 +72,134 @@ class _UpdateMatchState extends State<UpdateMatch> {
   Widget build(BuildContext context) {
     return Material(
 
-      child: FutureBuilder(
-        future: _getData(),
-        builder: (context,snapshot) {
-          if (snapshot.hasData) {
-            // print(snapshot.data);
-            Team dropdownValue = teams[0];
-          return Column(
-            children: [
-              Stepper(
-                currentStep: _currentStep,
-                steps: [
-                  Step(
-                    title: const Text("Please choose player"),
-                    content: CreateDropDown(teams: players,onItemSelected:onTeamSelected),
-                    isActive: _currentStep >= 0,
-                  ),
-                  Step(
-                    title: Text(_selectedTeam?.fname == null ? "Choose Player" :"What did ${_selectedTeam?.fname} do?" ),
-                    content:CreateStatsDropDown(
-                      stats: stats,
-                      onItemSelected: onStatsSelected,
+      child: GestureDetector(
+          onDoubleTap: () {
+            FocusScope.of(context).unfocus();
+          },
+        child: FutureBuilder(
+          future: _getData(),
+          builder: (context,snapshot) {
+            if (snapshot.hasData) {
+              // print(snapshot.data);
+              Team dropdownValue = teams[0];
+            return Column(
+              children: [
+                Stepper(
+                  currentStep: _currentStep,
+                  steps: [
+                    Step(
+                      title: const Text("Please choose player"),
+                      content: CreateDropDown(teams: players,onItemSelected:onTeamSelected),
+                      isActive: _currentStep >= 0,
                     ),
-                    isActive: _currentStep >= 1,
-                  ),
-                  Step(
-                    title: const Text("Choose the player that assisted." ),
-                    content:CreateDropDown(teams: players,onItemSelected:onTeam2Selected),
-                    isActive: _currentStep >= 2,
-                  ),
-                  Step(
-                    title:  Text(_selectedStats?.keys == null ? "choose time" :" ${_selectedStats?.keys} at what time?"),
-                    content:  TextField (
-                      controller: _controller,
-                      decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          labelText: 'Time',
-                          hintText: 'Ex. 15',
-                        prefixIcon: Icon(Icons.watch_later_outlined),enabledBorder: OutlineInputBorder(),
-                      ),cursorColor: Colors.red,keyboardType: TextInputType.number, onSubmitted: (value){
-                        setState(() {
-                          minutes = int.parse(_controller.text);
-                        });
-                    },
-                    )  ,
-                    isActive: _currentStep >= 3,
-                  ),
-                ],
-                type: StepperType.vertical,
-                controlsBuilder:
-                    (BuildContext context, ControlsDetails controlsDetails) {
-                  return Column(
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: ElevatedButton(
+                    Step(
+                      title: Text(_selectedTeam?.fname == null ? "Choose Player" :"What did ${_selectedTeam?.fname} do?" ),
+                      content:CreateStatsDropDown(
+                        stats: stats,
+                        onItemSelected: onStatsSelected,
+                      ),
+                      isActive: _currentStep >= 1,
+                    ),
+                    Step(
+                      title: const Text("Choose the player that assisted." ),
+                      content:CreateDropDown(teams: players,onItemSelected:onTeam2Selected),
+                      isActive: _currentStep >= 2,
+                    ),
+                    Step(
+                      title:  Text(_selectedStats?.keys == null ? "choose time" :" ${_selectedStats?.keys} at what time?"),
+                      content:  TextField (
+
+                        controller: _controller,
+                        decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            labelText: 'Time',
+                            hintText: 'Ex. 15',
+                          prefixIcon: Icon(Icons.watch_later_outlined),enabledBorder: OutlineInputBorder(),
+                        ),cursorColor: Colors.red,keyboardType: TextInputType.number, onSubmitted: (value){
+                          setState(() {
+                            minutes = int.parse(_controller.text);
+                          });
+                      },
+                      )  ,
+                      isActive: _currentStep >= 3,
+                    ),
+                  ],
+                  type: StepperType.vertical,
+                  controlsBuilder:
+                      (BuildContext context, ControlsDetails controlsDetails) {
+                    return Column(
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+
+                                if (_currentStep >= 3) {
+                                  print("Step = ${_currentStep}");
+                                  _currentStep = _currentStep;
+                                  print(minutes.toString());
+                                } else {
+                                  _currentStep = _currentStep + 1;
+                                }
+
+                                  });
+
+
+                            },
+                            child: const Text(
+                              "Continue",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 16,
+                        ),
+                        ElevatedButton(
                           onPressed: () {
-                            setState(() {
-
-                              if (_currentStep >= 3) {
-                                print("Step = ${_currentStep}");
-                                _currentStep = _currentStep;
-                                print(minutes.toString());
-                              } else {
-                                _currentStep = _currentStep + 1;
-                              }
-
-                                });
-
-
+                            Navigator.pop(context);
                           },
                           child: const Text(
-                            "Continue",
+                            "Cancel",
                             style: TextStyle(color: Colors.white),
                           ),
                         ),
-                      ),
-                      const SizedBox(
-                        height: 16,
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: const Text(
-                          "Cancel",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-              ElevatedButton(
-                child: Text('Upload'),
-                onPressed: () {
-                  setState(() {
-                    minutes = int.parse(_controller.text);
-                    print(minutes!.runtimeType.toString() + ' ${_selectedTeam!.id.runtimeType}' + ' ${_selectedStats!.values.first.runtimeType}' + ' ${widget.gameId}');
-                    StatsPost postdata = StatsPost(statstype: _selectedStats!.values.first, player: _selectedTeam!.id, game: widget.gameId, stats_time: minutes!);
-                    var queries = [];
-                    queries.add(postdata);
-                    if (_selected2Team != null){
-                      StatsPost postAssistData = StatsPost(statstype: 2, player: _selected2Team!.id, game: widget.gameId, stats_time: minutes!);
-                      queries.add(postAssistData);
-                    }
-
-
+                      ],
+                    );
+                  },
+                ),
+                ElevatedButton(
+                  child: Text('Upload'),
+                  onPressed: () {
                     setState(() {
+                      minutes = int.parse(_controller.text);
+                      print(minutes!.runtimeType.toString() + ' ${_selectedTeam!.id.runtimeType}' + ' ${_selectedStats!.values.first.runtimeType}' + ' ${widget.gameId}');
+                      StatsPost postdata = StatsPost(statstype: _selectedStats!.values.first, player: _selectedTeam!.id, game: widget.gameId, stats_time: minutes!);
+                      var queries = [];
+                      queries.add(postdata);
+                      if (_selected2Team != null){
+                        StatsPost postAssistData = StatsPost(statstype: 2, player: _selected2Team!.id, game: widget.gameId, stats_time: minutes!);
+                        queries.add(postAssistData);
+                      }
 
-                      queries.forEach((element) { APIService.postStats(element); });
-                      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
 
+                      setState(() {
+
+                        queries.forEach((element) { APIService.postStats(element); });
+                        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+
+                      });
                     });
-                  });
-                },
-              ),
-            ],
-          );
-        } else {
-            return const Center(child: CircularProgressIndicator());
-          }
-      }
+                  },
+                ),
+              ],
+            );
+          } else {
+              return const Center(child: CircularProgressIndicator());
+            }
+        }
+        ),
       ),
     );
   }

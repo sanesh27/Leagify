@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as client;
 import 'package:leagify/models/game_response.dart';
 
@@ -133,6 +134,27 @@ class APIService {
       return listMatch;
     } else {
       return [];
+    }
+  }
+
+  static Future<String> getMatchDetails(int teamId) async {
+    // var loginDetails = await SharedService.loginDetails();
+    // print(loginDetails!.jwt);
+    Map<String, String> requestHeaders = {
+      'content-Type': 'application/json',
+      // 'authorization' : '${loginDetails!.jwt}'
+    };
+
+    // print(teamId);
+    var url = Uri.http(Config.apiURL, Config.matchDetails + teamId!.toString());
+    debugPrint('calling getMatchdetails $url' );
+    var response = await client.get(url, headers: requestHeaders);
+
+    if (response.statusCode == 200) {
+      String matchURL = jsonDecode(response.body);
+      return matchURL;
+    } else {
+      return '';
     }
   }
 
