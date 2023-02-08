@@ -8,16 +8,20 @@ import 'package:leagify/mobile/Widgets/match_details.dart';
 import 'package:leagify/models/login_response_model.dart';
 import 'package:leagify/models/match_list.dart';
 import 'package:leagify/services/api_service.dart';
+import 'package:leagify/services/provider/data_provider.dart';
 import 'package:leagify/services/shared_services.dart';
-
+import 'package:provider/provider.dart';
 import '../constants.dart';
 import 'dart:core';
 import 'package:leagify/models/result_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:leagify/mobile/game_details_post.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:leagify/mobile/Widgets/standing_table.dart';
 
 import '../models/player_stats.model.dart';
+import '../widescreen/wide_screen.dart';
+import 'Widgets/stats_table.dart';
 import 'Widgets/team_cards.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -39,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String _logo(key) {
     String jsonString =
-        '{"The Dudes": "assets/dudes.svg", "The Bokas": "assets/bokas.svg", "The Boros": "assets/theboros.svg", "The Goats": "assets/goats.svg"}';
+        '{"The Dudes": "assets/dudes.png", "The Bokas": "assets/bokas.png", "The Boros": "assets/theboros.png", "The Goats": "assets/goats.png"}';
 
     Map<String, dynamic> jsonData = jsonDecode(jsonString);
     String value = jsonData.containsKey(key) ? jsonData[key] : "No Key";
@@ -53,6 +57,13 @@ class _HomeScreenState extends State<HomeScreen> {
     // TODO: implement initState
 
     _loadData();
+    final data = Provider.of<DataProvider>(context,listen: false);
+
+    data.fetchMatchList(context);
+    data.getCompletedGames(context);
+    data.getStandingTable(context);
+    data.getStats(context);
+    data.getImageData(context);
 
     super.initState();
     APICacheDBModel(key: 'player_images', syncData: 'player_images');
@@ -60,26 +71,30 @@ class _HomeScreenState extends State<HomeScreen> {
 
   _loadData() async {
     var data = await SharedService.cachedPlayerImages();
-    setState(() {
+
       imageData = data;
-    });
+
   }
 
   @override
   Widget build(BuildContext buildContext) {
     return LayoutBuilder(builder: (context, constraints) {
       double height = constraints.maxHeight;
-      return Scaffold(
+      double width = constraints.maxWidth;
+      if (width < 600){
+        return Scaffold(
         resizeToAvoidBottomInset: true,
         backgroundColor: kCanvasColor,
         body: Padding(
           padding: const EdgeInsets.all(0),
           child: SingleChildScrollView(
+
+            clipBehavior: Clip.none,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                 SizedBox(
+                SizedBox(
                   height: height * 0.05,
                 ),
                 SizedBox(
@@ -128,10 +143,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     textAlign: TextAlign.end,
                   ),
                 ),
-                Padding(
+                const Padding(
                   padding: const EdgeInsets.all(8),
-                  child: _standingTable(
-                      constraints.maxWidth, constraints.maxHeight),
+                  // child: _standingTable(
+                  //     constraints.maxWidth, constraints.maxHeight),
+                  child: StandingTable(),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8),
@@ -141,16 +157,20 @@ class _HomeScreenState extends State<HomeScreen> {
                     textAlign: TextAlign.end,
                   ),
                 ),
-                Padding(
+                const Padding(
                   padding: const EdgeInsets.all(8),
-                  child:
-                      _goalsTable(constraints.maxWidth, constraints.maxHeight),
+                  // child:
+                  //     _goalsTable(constraints.maxWidth, constraints.maxHeight),
+                  child: StatsTable(),
                 ),
               ],
             ),
           ),
         ),
-      );
+      );} else {
+        return WideLayout();
+      }
+
     });
   }
 
@@ -160,7 +180,7 @@ class _HomeScreenState extends State<HomeScreen> {
         builder:
             (BuildContext context, AsyncSnapshot<LoginResponseModel?> model) {
           if (model.hasData) {
-            _isAdmin = model.data!.email == "kiran.silwal" || model.data!.email == "niraj.shrestha" || model.data!.email == "samin.maharjan" || model.data!.email == "sanish.maharjan"  ? true : false;
+            _isAdmin = model.data!.isAdmin;
             return Text(
               '${model.data!.name}!',
               style: kHeading(const Color(0xFF3AA365), height),
@@ -172,43 +192,41 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _matchList(double width, double height) {
-    return FutureBuilder(
-        future: APIService.getMatchCards(),
-        builder: (BuildContext context, AsyncSnapshot<List<MatchList>> model) {
-          if (model.hasData) {
-            int completedGames =
-                model.data!.where((element) => element.status == 1).length;
-            return SizedBox(
-              height: height * 0.4,
-              child: ListView.builder(
-                controller: ScrollController(
-                    initialScrollOffset: width * 0.8 * (completedGames - 1)),
-                scrollDirection: Axis.horizontal,
-                itemCount: model.data!.length,
-                itemBuilder: (BuildContext context, int index) {
-                  // return MatchCards(model: model.data!, index: index, isAdmin: _isAdmin,);
-                  return matchCards(model, index, width, height);
-                },
-              ),
-            );
-          } else {
-            return const Center(child: CircularProgressIndicator());
-          }
-        });
+    final data = Provider.of<DataProvider>(context,listen: true);
+    List<MatchList> games = data.matchList;
+
+    return games.isEmpty ? Container() : SizedBox(
+      height: height * 0.4,
+      child: Consumer<DataProvider>(
+        builder: (context,data,child) {
+          int completedGames = data.completedGames;
+          return ListView.builder(
+            controller: ScrollController(
+                initialScrollOffset: width * 0.8 * (completedGames - 1)),
+            scrollDirection: Axis.horizontal,
+            itemCount: data.matchList.length,
+            itemBuilder: (BuildContext context, int index) {
+              // return MatchCards(model: model.data!, index: index, isAdmin: _isAdmin,);
+              return MatchCards(matchList: data.matchList[index],index: index,height: height,width: width,score: data.matchList[index].scores!,isAdmin: _isAdmin ,);
+            },
+          );
+        }
+      ),
+    );
   }
 
-  Widget matchCards(AsyncSnapshot<List<MatchList>> model, int index,
+  Widget matchCards(List<MatchList> model, int index,
       double width, double height) {
-    int gameId = model.data![index].gameId!;
-    DateTime schedule = model.data![index].schedule!;
-    String gameweek = model.data![index].gameweek.toString();
-    String team1 = model.data![index].team1.toString();
-    String team2 = model.data![index].team2.toString();
-    String team1Score = model.data![index].team1Score.toString();
-    String team2Score = model.data![index].team2Score.toString();
-    int status = model.data![index].status!;
+    int gameId = model[index].gameId!;
+    DateTime schedule = model![index].schedule!;
+    String gameweek = model[index].gameweek.toString();
+    String team1 = model[index].team1.toString();
+    String team2 = model[index].team2.toString();
+    String team1Score = model[index].team1Score.toString();
+    String team2Score = model[index].team2Score.toString();
+    int status = model[index].status!;
     bool hasScore = status == 1 ? true : false;
-    List<Score?> score = model.data![index].scores!;
+    List<Score?> score = model[index].scores!;
     Map<String, int> goalSum = {};
 
     return InkWell(
@@ -308,11 +326,7 @@ class _HomeScreenState extends State<HomeScreen> {
         // ),
         Expanded(
           flex: 2,
-          child: SvgPicture.asset(
-            _logo(team),
-            width: width * 0.20,
-            fit: BoxFit.contain,
-          ),
+          child: Image.asset(_logo(team),width: width * 0.2,),
         ),
         // SizedBox(
         //   height: 20,
@@ -418,286 +432,5 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
   }
-
-  Widget _standingTable(double width, double height) {
-    return FutureBuilder(
-        future: APIService.getStandings(),
-        builder:
-            (BuildContext context, AsyncSnapshot<List<TeamStanding>> model) {
-          if (model.hasData) {
-            model.data!.sort((a, b) {
-              if (a.points == b.points) {
-                return b.goalDifference.compareTo(a.goalDifference);
-              }
-              return b.points.compareTo(a.points);
-            });
-
-            return Card(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16)),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      _tableRow(
-                          "Team", "GP", "W", "D", "L","GF","GA","GD","Pts", width, true),
-                      for (var items in model.data!)
-                        _tableRow(
-                            items.teamName.toString(),
-                            items.played.toString(),
-                            items.win.toString(),
-                            items.draw.toString(),
-                            items.loss.toString(),
-                            items.goalsForward.toString(),
-                            items.goalsAgainst.toString(),
-                            items.goalDifference.toString(),
-                            items.points.toString(),
-                            width,
-                            false),
-                    ],
-                  ),
-                ));
-          } else {
-            return const Center(child: CircularProgressIndicator());
-          }
-        });
-  }
-
-  Widget _goalsTable(double width, double height) {
-    return FutureBuilder(
-        future: APIService.getGoals(),
-        builder: (BuildContext context,
-            AsyncSnapshot<List<PlayerStats>> statsModel) {
-          if (statsModel.hasData) {
-            List<PlayerStats> goalsSort = statsModel.data!;
-            List<PlayerStats> assistSort = [];
-            for (var element in goalsSort) {
-              assistSort.add(element);
-            }
-            goalsSort.sort((a, b) => b.goal.compareTo(a.goal));
-            assistSort.sort((a, b) => b.assists.compareTo(a.assists));
-
-            return Column(
-              children: [
-                Card(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: Text(
-                              "Goals",
-                              style:
-                                  kLargeSubtitle.copyWith(color: kBrandColor),
-                              textAlign: TextAlign.start,
-                            ),
-                          ),
-                          _tableRowPlayers("Player", "Goals", width, true,"None"),
-                          for (var items
-                              in goalsSort.where((element) => element.goal > 0))
-                            _tableRowPlayers(items.name.toString(),
-                                items.goal.toString(), width, false,items.team),
-                          const SizedBox(
-                            height: 40,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: Text(
-                              "Assists",
-                              style:
-                                  kLargeSubtitle.copyWith(color: kBrandColor),
-                              textAlign: TextAlign.start,
-                            ),
-                          ),
-                          _tableRowPlayers("Player", "Assists", width, true,"None"),
-                          for (var items in assistSort
-                              .where((element) => element.assists > 0))
-                            _tableRowPlayers(
-                                items.name.toString(),
-                                items.assists.toString().toString(),
-                                width,
-                                false,items.team),
-                        ],
-                      ),
-                    )),
-              ],
-            );
-          } else {
-            return const Center(child: CircularProgressIndicator());
-          }
-        });
-  }
-
-  Widget _tableRow(String teamName, String played, String win, String draw,
-      String loss,String forward, String against,String difference, String points, double width, bool head) {
-    Color textColor = head ? kScoreFutureMatch : kScoreStyle;
-
-    getLogo(String teamName) {
-      return SvgPicture.asset(
-        _logo(teamName),
-        width: 40,
-      );
-    }
-
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(4),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                  flex: 1,
-                  child: _logo(teamName) == "No Key"
-                      ? Container(
-                          width: 40,
-                        )
-                      : getLogo(teamName)),
-              Expanded(
-                  flex: 2,
-                  child: FittedBox(
-                    child: Text(
-                      teamName,
-                      style: kNormalSize.copyWith(color: textColor),
-                    ),
-                  )),
-              Expanded(child: SizedBox(width: 10,)),
-              Expanded(
-                  flex: 1,
-                  child: Text(
-                    played.toString(),
-                    style: kNormalSize.copyWith(color: textColor),
-                  )),
-              Expanded(
-                  flex: 1,
-                  child: Text(
-                    win.toString(),
-                    style: kNormalSize.copyWith(color: textColor),
-                  )),
-              Expanded(
-                  flex: 1,
-                  child: Text(
-                    draw.toString(),
-                    style: kNormalSize.copyWith(color: textColor),
-                  )),
-              Expanded(
-                  flex: 1,
-                  child: Text(
-                    loss.toString(),
-                    style: kNormalSize.copyWith(color: textColor),
-                  )),
-              Expanded(
-                  flex: 1,
-                  child: Text(
-                    forward.toString(),
-                    style: kNormalSize.copyWith(color: textColor),
-                  )),
-              Expanded(
-                  flex: 1,
-                  child: Text(
-                    against.toString(),
-                    style: kNormalSize.copyWith(color: textColor),
-                  )),
-              Expanded(
-                  flex: 1,
-                  child: Text(
-                    difference.toString(),
-                    style: kNormalSize.copyWith(color: textColor),
-                  )),
-              Expanded(
-                  flex: 1,
-                  child: Text(
-                    points.toString(),
-                    style: kNormalSize.copyWith(color: textColor),
-                  ))
-            ],
-          ),
-        ),
-        const Divider()
-      ],
-    );
-  }
-
-  Widget _tableRowPlayers(String name, String goals, double width, bool head,String team) {
-    Color textColor = head ? kScoreFutureMatch : kScoreStyle;
-
-    Map<String, dynamic> newData = imageData;
-    // print(newData['Sanish']);
-
-    hasImage(name) {
-      if (newData.containsKey(name)) {
-        return 1;
-      } else {
-        return "No Key";
-      }
-    }
-
-    getLogo(String teamName,String team) {
-      return Row(
-        children: [
-          CircleAvatar(
-            backgroundImage: CachedNetworkImageProvider(newData[teamName]),
-            radius: 40,
-          ),
-          const SizedBox(
-            width: 10,
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(teamName, style: kLargeSubtitle.copyWith(color: textColor)),
-              SizedBox(height: 10,),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-
-                  SvgPicture.asset(
-                    _logo(team),
-                    width: 25,
-                    fit: BoxFit.contain,
-
-                  ),
-                  SizedBox(width: 10,),
-                  Text(team, style: kNormalSize.copyWith(fontSize: 12.0,color: kGreetingColor)),
-                ],
-              ),
-            ],
-          ),
-        ],
-      );
-    }
-
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(4),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                  flex: 5,
-                  child: hasImage(name) == "No Key"
-                      ? Container(
-                          width: 0,
-                        )
-                      : getLogo(name,team)),
-              Expanded(
-                  flex: 1,
-                  child: Text(
-                    goals.toString(),
-                    style: kLargeSubtitle.copyWith(color: textColor),
-                  )),
-            ],
-          ),
-        ),
-        const Divider()
-      ],
-    );
-  }
-  // }
 }
+

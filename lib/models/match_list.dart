@@ -9,7 +9,7 @@ MatchList? matchListFromJson(String str) => MatchList.fromJson(json.decode(str))
 String matchListToJson(MatchList? data) => json.encode(data!.toJson());
 
 class MatchList {
-  MatchList({
+  const MatchList({
     this.gameId,
     this.gameweek,
     this.schedule,
@@ -22,16 +22,16 @@ class MatchList {
     this.scores,
   });
 
-  int? gameId;
-  String? gameweek;
-  DateTime? schedule;
-  int? status;
-  String? team1;
-  String? team2;
-  String? league;
-  int? team1Score;
-  int? team2Score;
-  List<Score?>? scores;
+  final int? gameId;
+  final String? gameweek;
+  final DateTime? schedule;
+  final int? status;
+  final String? team1;
+  final String? team2;
+  final String? league;
+  final int? team1Score;
+  final int? team2Score;
+  final List<Score?>? scores;
 
   factory MatchList.fromJson(Map<String, dynamic> json) {
     return MatchList(

@@ -81,7 +81,9 @@ class APIService {
       'content-Type': 'application/json',
       // 'authorization' : '${loginDetails!.jwt}'
     };
+
     var url = Uri.http(Config.apiURL, Config.matches);
+    debugPrint('calling ${url}');
     var response = await client.get(url, headers: requestHeaders);
 
     if (response.statusCode == 200) {
