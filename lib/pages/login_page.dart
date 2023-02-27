@@ -1,11 +1,14 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:leagify/constants.dart';
 import 'package:leagify/models/login_request.dart';
 import 'package:leagify/services/api_service.dart';
 import 'package:snippet_coder_utils/FormHelper.dart';
 import 'package:snippet_coder_utils/ProgressHUD.dart';
+import 'package:local_auth/local_auth.dart';
 
 
 class LoginPage extends StatefulWidget {
@@ -21,6 +24,109 @@ class _LoginPageState extends State<LoginPage> {
   GlobalKey<FormState> globalFormKey = GlobalKey<FormState>();
   String? username;
   String? password;
+  final _storage =  const FlutterSecureStorage();
+  static const String _userKey = "username_key";
+  static const String _passwordKey = "pwd_key";
+  final LocalAuthentication _auth = LocalAuthentication();
+  /*bool canAuthenticateWithBiometrics = false;
+  bool canAuthenticate = false;*/
+
+  @override
+  void initState() {
+    // _canCheckBiometrics();
+    // _readCredential();
+    _checkBiometric();
+    _getAvailableBiometric();
+    super.initState();
+  }
+
+  /*_canCheckBiometrics() async {
+    canAuthenticateWithBiometrics = await _auth.canCheckBiometrics;
+    canAuthenticate = (canAuthenticateWithBiometrics || await _auth.isDeviceSupported());
+  }*/
+
+  /*_authenticateBio() async {
+    try {
+      final bool didAuthenticate = await _auth.authenticate(
+        localizedReason: 'Please authenticate to show account balance',
+        options: const AuthenticationOptions(useErrorDialogs: false),
+      );
+    } on PlatformException catch (e) {
+      if (e.code == auth_error.notAvailable) {
+
+      } else if (e.code == auth_error.notEnrolled) {
+
+      } else {}
+    }
+  }*/
+
+    bool _canCheckBiometric = false;
+  Future<void> _checkBiometric() async {
+    bool canBiometric = false;
+    try {
+      canBiometric = await _auth.canCheckBiometrics;
+    } on PlatformException catch (e) {
+      print(e);
+    }
+
+    if (!mounted) return;
+    setState(() {
+      _canCheckBiometric = canBiometric;
+    });
+  }
+
+
+    List<BiometricType> _availableBiometric = [];
+  Future _getAvailableBiometric() async {
+    List<BiometricType> availableBiometric = [];
+    try {
+      availableBiometric = await _auth.getAvailableBiometrics();
+    } on PlatformException catch (e) {
+      print(e);
+    }
+
+    setState(() {
+      _availableBiometric = availableBiometric;
+    });
+  }
+
+  String authorized = "";
+  Future<void> _authenticate() async {
+    bool authenticated = false;
+    try {
+      print("herereeeeee");
+      authenticated = await _auth.authenticate(
+          localizedReason: "Scan your finger to authenticate",
+        options: const AuthenticationOptions(
+          useErrorDialogs: false
+        ),
+        authMessages: [],
+      );
+      await _readCredential();
+      print("herereeeeee  ${authenticated.toString()}");
+    } on PlatformException catch (e) {
+      print(e);
+    }
+    setState(() {
+      authorized = authenticated ? "Authorized success" : "Failed to authenticate";
+
+      print(authorized);
+    });
+  }
+
+  Future<void> _readCredential() async {
+    username = await _storage.read(key: _userKey) ?? "";
+    password = await _storage.read(key: _passwordKey) ?? "";
+    print("Credential $username $password");
+  }
+
+  Future<void> _saveCredentials() async {
+    String _userValue = username ?? "";
+    String _passwordValue = password ?? "";
+
+    await _storage.write(key: _userKey, value: _userValue);
+    await _storage.write(key: _passwordKey, value: _passwordValue);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,9 +200,9 @@ class _LoginPageState extends State<LoginPage> {
                     textColor: Colors.black54,
                     hintColor: Colors.black12,
                     borderRadius: 16,
-
                     backgroundColor: kScoreFutureMatch,
                     prefixIconColor: Colors.black12,
+                    initialValue: username ?? "",
                   ),
                   const SizedBox(
                     height: 8,
@@ -130,6 +236,7 @@ class _LoginPageState extends State<LoginPage> {
                     borderRadius: 16,
                     backgroundColor: kScoreFutureMatch,
                     obscureText: hidePassword,
+                    initialValue: password ?? ""
                   ),
                   const SizedBox(
                     height: 16,
@@ -141,6 +248,7 @@ class _LoginPageState extends State<LoginPage> {
                             () {
 
                           if(validateAndSave()){
+                            _saveCredentials();
                             setState(() {
                               isAPIcallProgress = true;
                             });
@@ -161,6 +269,44 @@ class _LoginPageState extends State<LoginPage> {
                               }
                             });
                           }
+                            },
+                        btnColor: kButtonColor,
+                        txtColor: kButtonTextColor,
+                        borderRadius: 16,
+                        borderColor: kCanvasColor
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                    child: FormHelper.submitButton(
+                        "Login Bio",
+                            () {
+
+                            _authenticate().then((value) {
+                              _saveCredentials();
+                              setState(() {
+                                isAPIcallProgress = true;
+                              });
+                              LoginRequestModel model = LoginRequestModel(username: username!, password: password!,email: username!,image: 'dummyimage');
+                              APIService.login(model).then((response) => {
+                                if(response){
+                                  Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false)
+                                }
+                                else {
+                                  FormHelper.showSimpleAlertDialog(context, "Leagify App", "Please check your connectivity and User/Pass", "Ok", (){
+                                    Navigator.pop(context);
+                                    setState(() {
+                                      isAPIcallProgress = false;
+                                    });
+
+
+                                  })
+                                }
+                              });
+                            });
+
+                          /*if(validateAndSave()){
+                          }*/
                             },
                         btnColor: kButtonColor,
                         txtColor: kButtonTextColor,

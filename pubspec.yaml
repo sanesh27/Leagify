@@ -44,11 +44,13 @@ dependencies:
   api_cache_manager: ^1.0.2
   snippet_coder_utils: ^1.0.12
   cached_network_image: ^3.2.3
+  flutter_secure_storage: ^8.0.0
   flutter_svg: ^1.1.6
   shimmer: ^2.0.0
   connectivity: ^3.0.6
   youtube_player_flutter: ^8.1.2
   flutter_lints: ^2.0.1
+  local_auth: any
 
 dev_dependencies:
   flutter_test:
