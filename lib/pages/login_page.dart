@@ -80,10 +80,16 @@ class _LoginPageState extends State<LoginPage> {
       authenticated = await _auth.authenticate(
           localizedReason: "Scan your finger to authenticate",
         options: const AuthenticationOptions(
-          useErrorDialogs: false
+          useErrorDialogs: true
         ),
         authMessages: [],
       );
+      if (authenticated) {
+        await _readCredential().then((value) {
+
+          login(setBioMetric: true);
+        });
+      }
     } on PlatformException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(
         "Login Cancelled",
@@ -92,10 +98,6 @@ class _LoginPageState extends State<LoginPage> {
         backgroundColor: Colors.red,
       ));
     }
-    await _readCredential().then((value) {
-
-      login(setBioMetric: true);
-    });
   }
 
   Future<void> _readCredential() async {
