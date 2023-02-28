@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,6 +5,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:leagify/constants.dart';
 import 'package:leagify/models/login_request.dart';
 import 'package:leagify/services/api_service.dart';
+import 'package:leagify/services/my_shared_preferences.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:snippet_coder_utils/FormHelper.dart';
 import 'package:snippet_coder_utils/ProgressHUD.dart';
 import 'package:local_auth/local_auth.dart';
@@ -28,8 +29,6 @@ class _LoginPageState extends State<LoginPage> {
   static const String _userKey = "username_key";
   static const String _passwordKey = "pwd_key";
   final LocalAuthentication _auth = LocalAuthentication();
-  /*bool canAuthenticateWithBiometrics = false;
-  bool canAuthenticate = false;*/
 
   @override
   void initState() {
@@ -39,26 +38,6 @@ class _LoginPageState extends State<LoginPage> {
     _getAvailableBiometric();
     super.initState();
   }
-
-  /*_canCheckBiometrics() async {
-    canAuthenticateWithBiometrics = await _auth.canCheckBiometrics;
-    canAuthenticate = (canAuthenticateWithBiometrics || await _auth.isDeviceSupported());
-  }*/
-
-  /*_authenticateBio() async {
-    try {
-      final bool didAuthenticate = await _auth.authenticate(
-        localizedReason: 'Please authenticate to show account balance',
-        options: const AuthenticationOptions(useErrorDialogs: false),
-      );
-    } on PlatformException catch (e) {
-      if (e.code == auth_error.notAvailable) {
-
-      } else if (e.code == auth_error.notEnrolled) {
-
-      } else {}
-    }
-  }*/
 
     bool _canCheckBiometric = false;
   Future<void> _checkBiometric() async {
@@ -102,15 +81,17 @@ class _LoginPageState extends State<LoginPage> {
         ),
         authMessages: [],
       );
-      await _readCredential();
-      print("herereeeeee  ${authenticated.toString()}");
     } on PlatformException catch (e) {
-      print(e);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(
+        "Login Cancelled",
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+        backgroundColor: Colors.red,
+      ));
     }
-    setState(() {
-      authorized = authenticated ? "Authorized success" : "Failed to authenticate";
+    await _readCredential().then((value) {
 
-      print(authorized);
+      login(setBioMetric: true);
     });
   }
 
@@ -246,29 +227,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: FormHelper.submitButton(
                         "Login",
                             () {
-
-                          if(validateAndSave()){
-                            _saveCredentials();
-                            setState(() {
-                              isAPIcallProgress = true;
-                            });
-                            LoginRequestModel model = LoginRequestModel(username: username!, password: password!,email: username!,image: 'dummyimage');
-                            APIService.login(model).then((response) => {
-                              if(response){
-                                Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false)
-                              }
-                              else {
-                                FormHelper.showSimpleAlertDialog(context, "Leagify App", "Please check your connectivity and User/Pass", "Ok", (){
-                                  Navigator.pop(context);
-                                  setState(() {
-                                    isAPIcallProgress = false;
-                                  });
-
-
-                                })
-                              }
-                            });
-                          }
+                              _checkFirsTimeLogin();
                             },
                         btnColor: kButtonColor,
                         txtColor: kButtonTextColor,
@@ -320,6 +279,130 @@ class _LoginPageState extends State<LoginPage> {
           ],
         );
       }
+    );
+  }
+
+  _checkFirsTimeLogin() async {
+    bool isFirstTimeLogin = await MySharedPrefs(SharedPreferences.getInstance()).getBool(FIRST_LOGIN, false);
+    if(!isFirstTimeLogin) {
+      if (validateAndSave() && _canCheckBiometric) {
+        biometricUserPrompt();
+      } else {
+        if (validateAndSave()) {
+          login();
+        }
+      }
+    } else {
+      _authenticate();
+    }
+
+  }
+
+  login({bool setBioMetric = false}) async {
+      _saveCredentials();
+      setState(() {
+        isAPIcallProgress = true;
+      });
+      LoginRequestModel model = LoginRequestModel(username: username!, password: password!,email: username!,image: 'dummyimage');
+      APIService.login(model).then((response) => {
+        if(response){
+          Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false)
+        }
+        else {
+          FormHelper.showSimpleAlertDialog(context, "Leagify App", "Please check your connectivity and User/Pass", "Ok", (){
+            Navigator.pop(context);
+            setState(() {
+              isAPIcallProgress = false;
+            });
+
+
+          })
+        }
+      });
+  }
+
+  biometricUserPrompt() {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 12.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                const Text(
+                  'Do you want to enable biometric login?',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                        login();
+                      },
+                      child: Expanded(
+                        // flex: 2,
+                        child: Container(
+                          width: 100,
+                          padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                          decoration: BoxDecoration(
+                            color: Colors.blue,
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          child: const Center(
+                            child:  Text('No',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () async {
+                        Navigator.pop(context);
+                        await MySharedPrefs(SharedPreferences.getInstance()).setBool(FIRST_LOGIN, true);
+                        login();
+                      },
+                      child: Expanded(
+                        // flex: 2,
+                        child: Container(
+                          width: 100,
+                          padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                          decoration: BoxDecoration(
+                            color: Colors.blue,
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          child: const Center(
+                            child:  Text('Yes',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        }
     );
   }
 
