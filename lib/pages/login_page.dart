@@ -235,44 +235,6 @@ class _LoginPageState extends State<LoginPage> {
                         borderColor: kCanvasColor
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                    child: FormHelper.submitButton(
-                        "Login Bio",
-                            () {
-
-                            _authenticate().then((value) {
-                              _saveCredentials();
-                              setState(() {
-                                isAPIcallProgress = true;
-                              });
-                              LoginRequestModel model = LoginRequestModel(username: username!, password: password!,email: username!,image: 'dummyimage');
-                              APIService.login(model).then((response) => {
-                                if(response){
-                                  Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false)
-                                }
-                                else {
-                                  FormHelper.showSimpleAlertDialog(context, "Leagify App", "Please check your connectivity and User/Pass", "Ok", (){
-                                    Navigator.pop(context);
-                                    setState(() {
-                                      isAPIcallProgress = false;
-                                    });
-
-
-                                  })
-                                }
-                              });
-                            });
-
-                          /*if(validateAndSave()){
-                          }*/
-                            },
-                        btnColor: kButtonColor,
-                        txtColor: kButtonTextColor,
-                        borderRadius: 16,
-                        borderColor: kCanvasColor
-                    ),
-                  ),
                 ],
               ),
             ),
