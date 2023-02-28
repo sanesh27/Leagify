@@ -87,7 +87,7 @@ class _LoginPageState extends State<LoginPage> {
       if (authenticated) {
         await _readCredential().then((value) {
 
-          login(setBioMetric: true);
+          login(setCredential: true);
         });
       }
     } on PlatformException catch (e) {
@@ -299,7 +299,7 @@ class _LoginPageState extends State<LoginPage> {
         }
     } else {
       if(validateAndSave()) {
-        login();
+        login(setCredential: false);
       }
     }
 
@@ -309,7 +309,7 @@ class _LoginPageState extends State<LoginPage> {
     isFirstTimeLogin = await MySharedPrefs(SharedPreferences.getInstance()).getBool(FIRST_LOGIN, false);
   }
 
-  login({bool setBioMetric = false}) async {
+  login({bool setCredential = false}) async {
       setState(() {
         isAPIcallProgress = true;
       });
@@ -317,7 +317,7 @@ class _LoginPageState extends State<LoginPage> {
           isFirstTimeLogin = await MySharedPrefs(SharedPreferences.getInstance()).getBool(FIRST_LOGIN, false);
       APIService.login(model).then((response) async {
         if (response)  {
-        _saveCredentials();
+        if(setCredential) _saveCredentials();
           Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
         }
         else {
@@ -359,7 +359,7 @@ class _LoginPageState extends State<LoginPage> {
                     InkWell(
                       onTap: () {
                         Navigator.pop(context);
-                        login();
+                        login(setCredential: false);
                       },
                       child: Expanded(
                         // flex: 2,
@@ -385,7 +385,7 @@ class _LoginPageState extends State<LoginPage> {
                       onTap: () async {
                         Navigator.pop(context);
                         await MySharedPrefs(SharedPreferences.getInstance()).setBool(FIRST_LOGIN, true);
-                        login();
+                        login(setCredential: true);
                       },
                       child: Expanded(
                         // flex: 2,
