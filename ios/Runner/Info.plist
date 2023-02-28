@@ -54,5 +54,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSFaceIDUsageDescription</key>
+	<string>App needs face id authentication for biometric login.</string>
 </dict>
 </plist>
