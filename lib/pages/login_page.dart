@@ -10,6 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:snippet_coder_utils/FormHelper.dart';
 import 'package:snippet_coder_utils/ProgressHUD.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
 
 
 class LoginPage extends StatefulWidget {
@@ -34,6 +36,7 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     // _canCheckBiometrics();
     // _readCredential();
+    _getBioWidget();
     _checkBiometric();
     _getAvailableBiometric();
     super.initState();
@@ -111,6 +114,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    _getBioWidget();
     return Scaffold(
       backgroundColor: kCanvasColor,
       body: ProgressHUD(
@@ -125,150 +129,194 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _loginUI(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context,constraints) {
-        double height = constraints.maxHeight;
-        return Column(
-          children: [
-            SizedBox(
-              height: height * 0.25,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Welcome to",
-                    style: kGreetingStyle,
-                  ),
-                  Text(
-                    "Leagify!",
-                    style: kHeading(const Color(0xFF3AA365),height),
-                  ),
-                ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12.0),
+      child: LayoutBuilder(
+        builder: (context,constraints) {
+          double height = constraints.maxHeight;
+          return Column(
+            children: [
+              SizedBox(
+                height: height * 0.15,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Welcome to",
+                      style: kGreetingStyle,
+                    ),
+                    Text(
+                      "Leagify!",
+                      style: kHeading(const Color(0xFF3AA365),height),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            SizedBox(
-              height: height * 0.35,
-              child: const Image(
-                image: AssetImage("assets/champions.png"),
+              SizedBox(
+                height: height * 0.30,
+                child: const Image(
+                  image: AssetImage("assets/champions.png"),
+                ),
               ),
-            ),
-            SizedBox(
-              height: height * 0.4,
-              child: Column(
+              SizedBox(
+                height: height * 0.4,
+                child: Column(
 
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  FormHelper.inputFieldWidget(
-                    context,
-                    "Username",
-                    "Username",
-                        (onValidateVal) {
-                      if (onValidateVal.isEmpty) {
-                        return "username cant be empty";
-                      }
-                      return null;
-                    },
-                        (onSavedVal) {
-                      username = onSavedVal;
-                    },
-                    borderColor: kCanvasColor,
-                    suffixIcon: const Icon(
-                      Icons.person,
-                    ),
-                    borderFocusColor: kBrandColor,
-                    textColor: Colors.black54,
-                    hintColor: Colors.black12,
-                    borderRadius: 16,
-                    backgroundColor: kScoreFutureMatch,
-                    prefixIconColor: Colors.black12,
-                    initialValue: username ?? "",
-                  ),
-                  const SizedBox(
-                    height: 8,
-                  ),
-                  FormHelper.inputFieldWidget(
-                    context,
-                    "password",
-                    "Password",
-                        (onValidateVal) {
-                      if (onValidateVal.isEmpty) {
-                        return "Password cant be empty";
-                      }
-                      return null;
-                    },
-                        (onSavedVal) {
-                      password = onSavedVal;
-                    },
-                    borderColor: kCanvasColor,
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          hidePassword = !hidePassword;
-                        });
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    FormHelper.inputFieldWidget(
+                      context,
+                      "Username",
+                      "Username",
+                          (onValidateVal) {
+                        if (onValidateVal.isEmpty) {
+                          return "username cant be empty";
+                        }
+                        return null;
                       },
-                      icon: Icon(
-                          hidePassword ? Icons.visibility_off : Icons.visibility),
+                          (onSavedVal) {
+                        username = onSavedVal;
+                      },
+                      borderColor: kCanvasColor,
+                      suffixIcon: const Icon(
+                        Icons.person,
+                      ),
+                      borderFocusColor: kBrandColor,
+                      textColor: Colors.black54,
+                      hintColor: Colors.black12,
+                      borderRadius: 16,
+                      backgroundColor: kScoreFutureMatch,
+                      prefixIconColor: Colors.black12,
+                      initialValue: username ?? "",
                     ),
-                    borderFocusColor: kBrandColor,
-                    textColor: Colors.black54,
-                    hintColor: Colors.black12,
-                    borderRadius: 16,
-                    backgroundColor: kScoreFutureMatch,
-                    obscureText: hidePassword,
-                    initialValue: password ?? ""
-                  ),
-                  const SizedBox(
-                    height: 16,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                    child: FormHelper.submitButton(
-                        "Login",
-                            () {
-                              _checkFirsTimeLogin();
-                            },
-                        btnColor: kButtonColor,
-                        txtColor: kButtonTextColor,
-                        borderRadius: 16,
-                        borderColor: kCanvasColor
+                    const SizedBox(
+                      height: 8,
                     ),
-                  ),
-                ],
+                    FormHelper.inputFieldWidget(
+                      context,
+                      "password",
+                      "Password",
+                          (onValidateVal) {
+                        if (onValidateVal.isEmpty) {
+                          return "Password cant be empty";
+                        }
+                        return null;
+                      },
+                          (onSavedVal) {
+                        password = onSavedVal;
+                      },
+                      borderColor: kCanvasColor,
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            hidePassword = !hidePassword;
+                          });
+                        },
+                        icon: Icon(
+                            hidePassword ? Icons.visibility_off : Icons.visibility),
+                      ),
+                      borderFocusColor: kBrandColor,
+                      textColor: Colors.black54,
+                      hintColor: Colors.black12,
+                      borderRadius: 16,
+                      backgroundColor: kScoreFutureMatch,
+                      obscureText: hidePassword,
+                      initialValue: password ?? ""
+                    ),
+                    const SizedBox(
+                      height: 16,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                      child: FormHelper.submitButton(
+                          "Login",
+                              () {
+                                _checkFirsTimeLogin();
+                              },
+                          btnColor: kButtonColor,
+                          txtColor: kButtonTextColor,
+                          borderRadius: 16,
+                          borderColor: kCanvasColor
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Visibility(
+                      visible: isFirstTimeLogin,
+                      child: InkWell(
+                        onTap: () {
+                          _authenticate();
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Biometric login ",
+                                style: kGreetingStyle.copyWith(
+                                  fontSize: 18,
+                                ),
+                              ),
+                              Image.asset(
+                                "assets/fingerprint.png",
+                                height: 20.0,
+                                width: 20.0,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+
+                  ],
+                ),
               ),
-            ),
-          ],
-        );
-      }
+            ],
+          );
+        }
+      ),
     );
   }
 
+  bool isFirstTimeLogin = false;
   _checkFirsTimeLogin() async {
-    bool isFirstTimeLogin = await MySharedPrefs(SharedPreferences.getInstance()).getBool(FIRST_LOGIN, false);
-    if(!isFirstTimeLogin) {
-      if (validateAndSave() && _canCheckBiometric) {
-        biometricUserPrompt();
-      } else {
-        if (validateAndSave()) {
-          login();
+    String name = await _storage.read(key: _userKey) ?? "";
+    String pwd = await _storage.read(key: _passwordKey) ?? "";
+    if ((name != username) && (pwd != password)) {
+      isFirstTimeLogin = await MySharedPrefs(SharedPreferences.getInstance()).getBool(FIRST_LOGIN, false);
+        if (validateAndSave() && _canCheckBiometric) {
+          biometricUserPrompt();
+        } else {
+          if (validateAndSave()) {
+            login();
+          }
         }
-      }
     } else {
-      _authenticate();
+      if(validateAndSave()) {
+        login();
+      }
     }
 
   }
 
+  Future<void> _getBioWidget() async {
+    isFirstTimeLogin = await MySharedPrefs(SharedPreferences.getInstance()).getBool(FIRST_LOGIN, false);
+  }
+
   login({bool setBioMetric = false}) async {
-      _saveCredentials();
       setState(() {
         isAPIcallProgress = true;
       });
       LoginRequestModel model = LoginRequestModel(username: username!, password: password!,email: username!,image: 'dummyimage');
-      APIService.login(model).then((response) => {
-        if(response){
-          Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false)
+          isFirstTimeLogin = await MySharedPrefs(SharedPreferences.getInstance()).getBool(FIRST_LOGIN, false);
+      APIService.login(model).then((response) async {
+        if (response)  {
+        _saveCredentials();
+          Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
         }
         else {
           FormHelper.showSimpleAlertDialog(context, "Leagify App", "Please check your connectivity and User/Pass", "Ok", (){
@@ -276,9 +324,7 @@ class _LoginPageState extends State<LoginPage> {
             setState(() {
               isAPIcallProgress = false;
             });
-
-
-          })
+          });
         }
       });
   }
